@@ -6,9 +6,7 @@ import com.example.diplom.dto.request.RegisterDtoRequest;
 import com.example.diplom.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,21 +15,14 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @ModelAttribute RegisterDtoRequest request){
+    public ResponseEntity<String> registerUser(@Valid @RequestBody RegisterDtoRequest request){
         authService.register(request);
-        System.out.println();
-        return new ResponseEntity<>();
+        return ResponseEntity.ok("Вы успешно зарегистрировались!");
     }
 
-    @GetMapping("/register")
-    public String register(){return "register";}
-
-    @GetMapping("/login")
-    public String login(){return "login";}
-
     @PostMapping("/login")
-    public String loginUser(@Valid @RequestBody LoginDtoRequest request){
+    public ResponseEntity<String> loginUser(@Valid @RequestBody LoginDtoRequest request){
         authService.login(request);
-        return "/product";
+        return ResponseEntity.ok("Вы успешно вошли");
     }
 }
