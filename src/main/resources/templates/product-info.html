@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>ArsenShop</title>
+</head>
+<body>
+<h1>ArsenShop</h1>
+<div>
+    <img th:src="@{/images/{id}(id=${product.images[0].id})}" height="60px"><br><br>
+    <img th:if="${product.images.size() > 1}" th:src="@{/images/{id}(id=${product.images[1].id})}" height="60px"><br><br>
+    <img th:if="${product.images.size() > 2}" th:src="@{/images/{id}(id=${product.images[2].id})}" height="60px"><br><br>
+    <p><b>Название:</b> <span th:text="${product.title}"></span></p>
+    <p><b>Цена:</b> <span th:text="${product.price}"></span> руб.</p>
+    <p><b>Количество на складе: </b><span th:text="${product.quantity}"></span> шт.</p>
+    <p><b>Автор:</b><a th:href="@{/user/{id}(id=${product.supplier.id})}" th:text="${product.supplier.login}"></a></p>
+</div>
+
+<a th:href="@{/product}">Назад к списку товаров</a>
+
+<!-- Форма для создания нового товара -->
+<div th:if="${user.isSupplier} and ${user.login} == ${product.supplier.login}">
+<form th:action="@{/product/delete/{id}(id=${product.id})}" method="post">
+    <input type="submit" value="Удалить товар"/>
+</form>
+</div>
+<!-- Форма для добавления товара в корзину -->
+<div th:if="${user.isClient}">
+    <form th:action="@{/cart/add}" method="post">
+        <input type="hidden" name="productId" th:value="${product.id}">
+        <label>Количество:</label>
+        <input type="number" name="quantity" value="1" min="1" required>
+        <input type="submit" value="Добавить в корзину">
+    </form>
+</div>
+</body>
+</html>

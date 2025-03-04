@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Заказы поставщика</title>
+</head>
+<body>
+<h1>Заказы поставщика</h1>
+<h3 th:text="'Поставщик: ' + ${user.login}">Имя поставщика</h3>
+
+<div th:if="${order == null}">
+  <p>У вас пока нет заказов.</p>
+</div>
+
+<div th:if="${order != null}">
+  <h3>Информация о заказе</h3>
+  <p><b>Адрес доставки:</b> <span th:text="${order.address}"></span></p>
+  <p><b>Город:</b> <span th:text="${order.city}"></span></p>
+  <p><b>Дата заказа:</b> <span th:text="${order.dateTime}"></span></p>
+  <p><b>Статус:</b> <span th:text="${order.status}"></span></p>
+  <p><b>Общая стоимость:</b> <span th:text="${order.totalPrice}"></span> руб.</p>
+
+  <h4>Товары в заказе</h4>
+  <table border="1">
+    <thead>
+    <tr>
+      <th>Название</th>
+      <th>Количество</th>
+      <th>Цена продажи</th>
+      <th>Общая цена</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${order.orderItems}">
+      <td th:text="${item.product.title}"></td>
+      <td th:text="${item.quantity}"></td>
+      <td th:text="${item.sellingPrice} + ' руб.'"></td>
+      <td th:text="${item.totalPrice} + ' руб.'"></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<a href="/">Назад на главную</a>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Заказы поставщика</title>
+</head>
+<body>
+<h1>Заказы поставщика</h1>
+<h3 th:text="'Поставщик: ' + ${user.login}">Имя поставщика</h3>
+
+
+<div th:if="${orders != null and not #lists.isEmpty(orders)}">
+    <h4>Товары в заказе</h4>
+    <table border="1">
+      <thead>
+      <tr>
+        <th>Номер заказа</th>
+        <th>Общая стоимость</th>
+        <th>Выручка</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="order : ${orders}">
+        <td th:text="${order.id}"></td>
+        <td th:text="${order.totalCost} + ' руб.'"></td>
+        <td th:text="${order.profit} + ' руб.'"></td>
+        <td><a th:href="@{/order/info/{id}(id=${order.id})}">Подробнее</a></td>
+      </tr>
+      </tbody>
+    </table>
+</div>
+
+<p th:if="${orders == null or #lists.isEmpty(orders)}">У вас пока нет заказов.</p>
+
+
+<a href="/">Назад на главную</a>
+</body>
+</html>
