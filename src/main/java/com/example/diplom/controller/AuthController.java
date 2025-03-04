@@ -6,18 +6,20 @@ import com.example.diplom.dto.request.RegisterDtoRequest;
 import com.example.diplom.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @AllArgsConstructor
 public class AuthController {
     private AuthService authService;
 
     @PostMapping("/register")
-    public String registerUser(@Valid @ModelAttribute RegisterDtoRequest request){
+    public ResponseEntity<?> registerUser(@Valid @ModelAttribute RegisterDtoRequest request){
         authService.register(request);
-        return "redirect:/login";
+        return new ResponseEntity<>();
     }
 
     @GetMapping("/register")
