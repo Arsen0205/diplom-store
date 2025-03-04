@@ -19,6 +19,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @ModelAttribute RegisterDtoRequest request){
         authService.register(request);
+        System.out.println();
         return new ResponseEntity<>();
     }
 
