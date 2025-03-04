@@ -17,7 +17,6 @@ public class AuthController {
     @PostMapping("/register")
     public String registerUser(@Valid @ModelAttribute RegisterDtoRequest request){
         authService.register(request);
-        System.out.println("Переданные данные: " + request);
         return "redirect:/login";
     }
 
