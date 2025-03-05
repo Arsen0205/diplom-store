@@ -9,8 +9,11 @@ import com.example.diplom.repository.ClientRepository;
 import com.example.diplom.repository.SupplierRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -53,17 +56,31 @@ public class AuthService {
         }
     }
 
-    public Response login(LoginDtoRequest request){
-        Supplier supplier = supplierRepository.findByLogin(request.getLogin()).orElseThrow(()-> new RuntimeException("Пользователь с таким логином не существует"));
-        Client client = clientRepository.findByLogin(request.getLogin()).orElseThrow(()-> new RuntimeException("Пользователь с логином не существует"));
 
-        if(!passwordEncoder.matches(request.getPassword(), supplier.getPassword()) || !passwordEncoder.matches(request.getPassword(), client.getPassword())){
-            throw new RuntimeException("Неверный пароль!");
-        }
-        if(!supplier.isActive() || !client.isActive()){
-            throw new RuntimeException("Пользователь заблокирован");
+    public void login(LoginDtoRequest request){
+        Optional<Supplier> supplierOptional = supplierRepository.findByLogin(request.getLogin());
+
+        if (supplierOptional.isPresent()){
+            Supplier supplier = supplierOptional.get();
+
+            if(!passwordEncoder.matches(request.getPassword(), supplier.getPassword())){
+                throw new RuntimeException("Неверный пароль!");
+            } else if (!supplier.isActive()) {
+                throw new RuntimeException("Пользователь заблокирован");
+            }
+
         }
 
-        return new Response("Вход выполнен успешно");
+        Optional<Client> clientOptional = clientRepository.findByLogin(request.getLogin());
+
+        if(clientOptional.isPresent()) {
+            Client client = clientOptional.get();
+            if (!passwordEncoder.matches(request.getPassword(), client.getPassword())) {
+                throw new RuntimeException("Неверный пароль!");
+            }
+            if (!client.isActive()) {
+                throw new RuntimeException("Пользователь заблокирован");
+            }
+        }
     }
 }
