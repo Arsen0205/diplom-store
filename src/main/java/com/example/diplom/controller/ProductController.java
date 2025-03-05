@@ -19,7 +19,7 @@ import java.security.Principal;
 import java.util.List;
 
 @Slf4j
-@Controller
+@RestController
 @AllArgsConstructor
 public class ProductController {
     private ProductService productService;

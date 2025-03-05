@@ -26,10 +26,6 @@ public class SecurityConfig {
                         .requestMatchers("/addSong").hasRole("PERFORMER")
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/product", true)
-                        .permitAll())
                 .logout(logout -> logout.permitAll());
         return http.build();
     }
