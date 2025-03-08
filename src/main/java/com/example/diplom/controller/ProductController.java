@@ -10,37 +10,50 @@ import com.example.diplom.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
-@Slf4j
 @RestController
 @AllArgsConstructor
+@RequestMapping("/product")
 public class ProductController {
     private ProductService productService;
     private SupplierRepository supplierRepository;
     private ProductRepository productRepository;
 
-    @GetMapping("/product")
-    public String product(Model model, Principal principal){
+    @GetMapping
+    public ResponseEntity<List<Product>> product(Principal principal){
         List<Product> products = productRepository.findAll();
-
-        model.addAttribute("user", productService.getUserByPrincipal(principal));
-        model.addAttribute("products", products);
-
-        return "product";
+        return ResponseEntity.ok(products);
     }
 
-    @PostMapping("/product/create")
-    public String createProduct(@Valid @ModelAttribute CreateProductDtoRequest request, Principal principal) throws IOException{
+    @PostMapping("/create")
+    public ResponseEntity<Product> createProduct(
+            @RequestParam("title") String title,
+            @RequestParam("quantity") int quantity,
+            @RequestParam("price") BigDecimal price,
+            @RequestParam("sellingPrice") BigDecimal sellingPrice,
+            @RequestParam("images") List<MultipartFile> images,
+            Principal principal) throws IOException {
+
+        CreateProductDtoRequest request = new CreateProductDtoRequest();
+        request.setTitle(title);
+        request.setQuantity(quantity);
+        request.setPrice(price);
+        request.setSellingPrice(sellingPrice);
+        request.setImages(images);
         Product product = productService.createProduct(request, principal);
-        Supplier currentUser = product.getSupplier();
-        return "redirect:/user/" + currentUser.getId();
+        System.out.println(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
 
     @GetMapping("/product/{id}")
