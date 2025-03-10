@@ -1,64 +1,67 @@
 package com.example.diplom.controller;
 
 
-import com.example.diplom.models.Cart;
-import com.example.diplom.models.Client;
-import com.example.diplom.models.Order;
-import com.example.diplom.models.Supplier;
+import com.example.diplom.dto.request.CreateOrderDtoRequest;
+import com.example.diplom.models.*;
 import com.example.diplom.repository.CartRepository;
+import com.example.diplom.repository.OrderItemRepository;
 import com.example.diplom.repository.OrderRepository;
 import com.example.diplom.repository.SupplierRepository;
 import com.example.diplom.service.OrderService;
 import com.example.diplom.service.ProductService;
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-@Controller
+@RestController
 @AllArgsConstructor
+@RequestMapping("/order")
 public class OrderController {
     private OrderService orderService;
     private CartRepository cartRepository;
     private ProductService productService;
     private SupplierRepository supplierRepository;
     private OrderRepository orderRepository;
+    private OrderItemRepository orderItemRepository;
 
-    @GetMapping("/order/checkout")
-    public String checkoutPage(Model model, Principal principal) {
-        Client client = orderService.getUserByPrincipal(principal);
-        Cart cart = cartRepository.findByClientId(client.getId()).orElse(new Cart());
+    @GetMapping("/checkout")
+    public ResponseEntity<String> checkoutPage(Principal principal) {
+        Cart cart = cartRepository.findByClientId(orderService.getUserByPrincipal(principal).getId()).orElse(new Cart());
 
         if (cart.getItems().isEmpty()) {
-            return "redirect:/user/" + client.getId();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Корзина пустая");
         }
-
-        model.addAttribute("cart", cart);
-        return "create-order"; // Название Thymeleaf-шаблона оформления заказа
+        return ResponseEntity.status(HttpStatus.OK)
+                .body("Корзина готова к оформлению");
     }
 
-    @PostMapping("/order/create")
-    public String orderCreate(@RequestParam String address, @RequestParam String city, Principal principal){
-        orderService.createdOrder(principal,address,city);
+    @PostMapping("/create")
+    public ResponseEntity<String> orderCreate(@RequestBody CreateOrderDtoRequest request, Principal principal){
+        orderService.createdOrder(principal, request);
 
-        return "redirect:/user/" + orderService.getUserByPrincipal(principal).getId();
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Заказ успешно оформлен");
     }
 
-    @GetMapping("/order/info/{id}")
-    public String orderInfo(@PathVariable("id") Long id, Model model, Principal principal){
+    @GetMapping("/info/{id}")
+    public ResponseEntity<?> orderInfo(@PathVariable("id") Long id, Principal principal){
         Object currentUser = productService.getUserByPrincipal(principal);
         Supplier supplier = supplierRepository.findByLogin(principal.getName()).orElseThrow(()-> new IllegalArgumentException("Пользователя не существует"));
         Order order = orderRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("Такого заказа не существует"));
 
-        model.addAttribute("currentUser", currentUser);
-        model.addAttribute("user", supplier);
-        model.addAttribute("order", order);
+        Map<String, Object> response = new HashMap<>();
+        List<OrderItem> items = orderItemRepository.findByOrder(order);
 
-        return "order-info";
+        response.put("order", order);
+
+        return ResponseEntity.ok(response);
     }
 }
