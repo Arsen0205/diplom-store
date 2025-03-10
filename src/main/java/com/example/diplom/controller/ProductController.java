@@ -2,17 +2,14 @@ package com.example.diplom.controller;
 
 
 import com.example.diplom.dto.request.CreateProductDtoRequest;
+import com.example.diplom.dto.response.ProductDtoResponse;
 import com.example.diplom.models.Product;
 import com.example.diplom.models.Supplier;
 import com.example.diplom.repository.ProductRepository;
-import com.example.diplom.repository.SupplierRepository;
 import com.example.diplom.service.ProductService;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,14 +17,12 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("/product")
 public class ProductController {
     private ProductService productService;
-    private SupplierRepository supplierRepository;
     private ProductRepository productRepository;
 
     @GetMapping
@@ -56,22 +51,32 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
 
-    @GetMapping("/product/{id}")
-    public String productInfo(@PathVariable Long id, Model model, Principal principal){
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductDtoResponse> productInfo(@PathVariable Long id, Principal principal){
         Product product = productRepository.findById(id).orElseThrow(()-> new RuntimeException("Товара с таким id нет: " + id));
 
-        model.addAttribute("user", productService.getUserByPrincipal(principal));
-        model.addAttribute("product", product);
-        model.addAttribute("images",product.getImages());
+       ProductDtoResponse response = new ProductDtoResponse(
+               product.getId(),
+               product.getTitle(),
+               product.getQuantity(),
+               product.getPrice(),
+               product.getSellingPrice(),
+               product.getSupplier().getId()
+       );
 
-        return "product-info";
+       return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/product/delete/{id}")
-    private String deleteProduct(@PathVariable("id") Long id){
+    @PostMapping("/delete/{id}")
+    private ResponseEntity<String> deleteProduct(@PathVariable("id") Long id, Principal principal){
         Product product = productRepository.findById(id).orElseThrow(()->new RuntimeException("Продукта нет"));
-        Supplier currentUser = product.getSupplier();
+        Supplier currentUser = (Supplier) productService.getUserByPrincipal(principal);
+        if(!product.getSupplier().getId().equals(currentUser.getId())){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Вы не можете удалить этот продукт");
+        }
         productRepository.deleteById(id);
-        return "redirect:/user/" + currentUser.getId();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body("Продукт успешно удален");
     }
 }
