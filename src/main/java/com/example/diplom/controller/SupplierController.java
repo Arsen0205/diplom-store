@@ -28,21 +28,21 @@ public class SupplierController {
     private OrderRepository orderRepository;
 
 
-    @GetMapping("/orders/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<?> supplierOrders(@PathVariable("id") Long userId, Principal principal){
         Supplier currentUser = (Supplier)productService.getUserByPrincipal(principal);
         Optional<Supplier> supplierOpt = supplierRepository.findById(userId);
 
         if (supplierOpt.isPresent()){
-            if (!currentUser.getId().equals(supplierOpt.get().getId())){
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body("Вы не можете посмотреть заказы чужого поставщика!");
-            }
-
+            Map<String, Object> response = new HashMap<>();
             Supplier supplier = supplierOpt.get();
             List<Order> orders = orderRepository.findBySupplier(supplier);
 
-            Map<String, Object> response = new HashMap<>();
+            if (!currentUser.getId().equals(supplierOpt.get().getId())){
+                response.put("supplier", supplier);
+                return ResponseEntity.ok(response);
+            }
+
             response.put("supplier", supplier);
             response.put("orders", orders);
             response.put("role","supplier");
