@@ -6,75 +6,52 @@ import com.example.diplom.repository.*;
 import com.example.diplom.service.ProductService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
 @Controller
 @AllArgsConstructor
+@RequestMapping("/supplier")
 public class SupplierController {
-
-    private ProductRepository productRepository;
     private SupplierRepository supplierRepository;
     private ProductService productService;
-    private ClientRepository clientRepository;
-    private CartRepository cartRepository;
     private OrderRepository orderRepository;
 
-    @GetMapping("/user/{id}")
-    public String userInfo(@PathVariable("id") Long userId, Model model, Principal principal) {
-        Object currentUser = productService.getUserByPrincipal(principal);
-        model.addAttribute("currentUser", currentUser); // Добавляем текущего пользователя в модель
 
-        Optional<Supplier> supplierOpt = supplierRepository.findById(userId);
-        if (supplierOpt.isPresent()) { // Проверяем, найден ли поставщик
-            Supplier supplier = supplierOpt.get();
-            List<Product> products = productRepository.findBySupplier(supplier);
-
-            model.addAttribute("user", supplier);
-            model.addAttribute("products", products);
-            model.addAttribute("role", "supplier");
-            return "user-info";
-        }
-
-        Optional<Client> clientOpt = clientRepository.findById(userId);
-        if (clientOpt.isPresent()) { // Проверяем, найден ли клиент
-            Client client = clientOpt.get();
-            Cart cart =  cartRepository.findByClient(client).orElse(new Cart());
-
-            model.addAttribute("cart", cart);
-            model.addAttribute("user", client);
-            model.addAttribute("role", "client");
-            return "user-info";
-        }
-
-        // Если пользователь не найден, перенаправляем на страницу ошибки
-        return "redirect:/error";
-    }
-
-
-    @GetMapping("/supplier/orders/{id}")
-    public String supplierOrders(@PathVariable("id") Long userId, Model model, Principal principal){
-        Object currentUser = productService.getUserByPrincipal(principal);
-        model.addAttribute("currentUser", currentUser); // Добавляем текущего пользователя в модель
+    @GetMapping("/orders/{id}")
+    public ResponseEntity<?> supplierOrders(@PathVariable("id") Long userId, Principal principal){
+        Supplier currentUser = (Supplier)productService.getUserByPrincipal(principal);
         Optional<Supplier> supplierOpt = supplierRepository.findById(userId);
 
         if (supplierOpt.isPresent()){
+            if (!currentUser.getId().equals(supplierOpt.get().getId())){
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("Вы не можете посмотреть заказы чужого поставщика!");
+            }
+
             Supplier supplier = supplierOpt.get();
             List<Order> orders = orderRepository.findBySupplier(supplier);
 
-            model.addAttribute("user", supplier);
-            model.addAttribute("orders", orders);
-            model.addAttribute("role", "supplier");
-            return "/suppliers-orders";
+            Map<String, Object> response = new HashMap<>();
+            response.put("supplier", supplier);
+            response.put("orders", orders);
+            response.put("role","supplier");
+
+            return ResponseEntity.ok(response);
         }
 
-        return "redirect:/error";
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("Поставщик не найден");
     }
 }
