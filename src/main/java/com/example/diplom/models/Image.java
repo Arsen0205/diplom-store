@@ -30,8 +30,8 @@ public class Image {
     @Column(name="isPreviewImage")
     private boolean isPreviewImage;
 
-    @Lob
-    private byte[] bytes;
+    @Column(name="url")
+    private String url;
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
