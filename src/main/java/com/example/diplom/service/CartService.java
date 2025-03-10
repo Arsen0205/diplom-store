@@ -1,6 +1,7 @@
 package com.example.diplom.service;
 
 import com.example.diplom.dto.request.AddCartDtoRequest;
+import com.example.diplom.dto.request.DeleteCartItemDtoRequest;
 import com.example.diplom.models.*;
 import com.example.diplom.repository.CartItemRepository;
 import com.example.diplom.repository.CartRepository;
@@ -82,18 +83,19 @@ public class CartService {
         }
     }
 
-    public void cartRemoveQuantity(Long id, Principal principal){
-        Optional<CartItem> cartItemOpt = cartItemRepository.findById(id);
-        Cart cart = cartRepository.findByClientId(getUserByPrincipal(principal).getId()).orElseThrow();
+    public void cartRemoveQuantity(DeleteCartItemDtoRequest request, Principal principal){
+        Optional<CartItem> cartItemOpt = cartItemRepository.findById(request.getId());
+        Client client = clientRepository.findById(getUserByPrincipal(principal).getId()).orElseThrow(()->new IllegalArgumentException("Пользователя не существует"));
+        Cart cart = cartRepository.findByClientId(client.getId()).orElseThrow();
 
         if (cartItemOpt.isPresent()) {
             CartItem cartItem = cartItemOpt.get();
 
             if (cartItem.getCart().getClient().getLogin().equals(principal.getName())) {
                 if (cartItem.getQuantity() > 1) {
-                    cartItem.setQuantity(cartItem.getQuantity() - 1);
+                    cartItem.setQuantity(cartItem.getQuantity() - request.getQuantity());
                     cartItemRepository.save(cartItem);
-                    calculatePrice(id);
+                    calculatePrice(request.getId());
                     updateCartTotalPrice(cart);
                 } else {
                     cartItemRepository.delete(cartItem);

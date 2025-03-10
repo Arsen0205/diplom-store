@@ -1,6 +1,7 @@
 package com.example.diplom.controller;
 
 import com.example.diplom.dto.request.AddCartDtoRequest;
+import com.example.diplom.dto.request.DeleteCartItemDtoRequest;
 import com.example.diplom.models.Cart;
 import com.example.diplom.models.CartItem;
 import com.example.diplom.models.Client;
@@ -8,37 +9,39 @@ import com.example.diplom.repository.CartItemRepository;
 import com.example.diplom.service.CartService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.Optional;
 
-@Controller
+
+@RestController
 @AllArgsConstructor
+@RequestMapping("/cart")
 public class CartController {
     private CartService cartService;
     private CartItemRepository cartItemRepository;
 
-    @PostMapping("/cart/add")
-    public String addCart(@Valid @ModelAttribute AddCartDtoRequest request, Principal principal){
+    @PostMapping("/add")
+    public ResponseEntity<String> addCart(@Valid @RequestBody AddCartDtoRequest request, Principal principal){
         cartService.addCart(request, principal);
-        Client client = cartService.getUserByPrincipal(principal);
-        return "redirect:/user/" + client.getId();
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Товар добавлен");
     }
 
-    @GetMapping("/cart/remove/{itemId}")
-    public String cartRemove(@PathVariable("itemId") Long id, Principal principal){
+    @GetMapping("/remove/{itemId}")
+    public ResponseEntity<String> cartRemove(@PathVariable("itemId") Long id, Principal principal){
         cartService.cartRemove(id, principal);
-        return "redirect:/user/" + cartService.getUserByPrincipal(principal).getId();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body("Вы удалили товар из корзины");
     }
 
-    @GetMapping("/cart/decrease/{itemId}")
-    public String decreaseItemQuantity(@PathVariable("itemId") Long itemId, Principal principal) {
-        cartService.cartRemoveQuantity(itemId, principal);
-        return "redirect:/user/" + cartService.getUserByPrincipal(principal).getId();
+    @PostMapping("/decrease")
+    public ResponseEntity<String> decreaseItemQuantity(@RequestBody DeleteCartItemDtoRequest request, Principal principal) {
+        cartService.cartRemoveQuantity(request, principal);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body("Продукт удален в количестве: " + request.getQuantity());
     }
 }
