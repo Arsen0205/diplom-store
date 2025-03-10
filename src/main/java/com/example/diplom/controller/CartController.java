@@ -2,16 +2,12 @@ package com.example.diplom.controller;
 
 import com.example.diplom.dto.request.AddCartDtoRequest;
 import com.example.diplom.dto.request.DeleteCartItemDtoRequest;
-import com.example.diplom.models.Cart;
-import com.example.diplom.models.CartItem;
-import com.example.diplom.models.Client;
 import com.example.diplom.repository.CartItemRepository;
 import com.example.diplom.service.CartService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;

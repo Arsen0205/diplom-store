@@ -1,5 +1,6 @@
 package com.example.diplom.service;
 
+import com.example.diplom.dto.request.CreateOrderDtoRequest;
 import com.example.diplom.models.*;
 import com.example.diplom.models.enums.OrderStatus;
 import com.example.diplom.repository.*;
@@ -27,7 +28,7 @@ public class OrderService {
     private final SupplierRepository supplierRepository;
 
     @Transactional
-    public void createdOrder(Principal principal, String address, String city){
+    public void createdOrder(Principal principal, CreateOrderDtoRequest request){
         Cart cart = cartRepository.findByClientId(getUserByPrincipal(principal).getId()).orElseThrow(()-> new IllegalArgumentException("Корзина пуста"));
 
         if (cart.getItems().isEmpty()){
@@ -49,8 +50,8 @@ public class OrderService {
                     .totalPrice(BigDecimal.ZERO)
                     .profit(BigDecimal.ZERO)
                     .status(OrderStatus.PENDING)
-                    .address(address)
-                    .city(city)
+                    .address(request.getAddress())
+                    .city(request.getCity())
                     .orderItems(new ArrayList<>())
                     .build();
 
