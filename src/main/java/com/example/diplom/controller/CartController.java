@@ -20,6 +20,7 @@ public class CartController {
     private CartService cartService;
     private CartItemRepository cartItemRepository;
 
+    //Добавление товара в заказ
     @PostMapping("/add")
     public ResponseEntity<String> addCart(@Valid @RequestBody AddCartDtoRequest request, Principal principal){
         cartService.addCart(request, principal);
@@ -27,6 +28,7 @@ public class CartController {
                 .body("Товар добавлен");
     }
 
+    //Удаление определенного товара в корзине
     @GetMapping("/remove/{itemId}")
     public ResponseEntity<String> cartRemove(@PathVariable("itemId") Long id, Principal principal){
         cartService.cartRemove(id, principal);
@@ -34,6 +36,7 @@ public class CartController {
                 .body("Вы удалили товар из корзины");
     }
 
+    //Удаление определенного кол-ва товара в корзине
     @PostMapping("/decrease")
     public ResponseEntity<String> decreaseItemQuantity(@RequestBody DeleteCartItemDtoRequest request, Principal principal) {
         cartService.cartRemoveQuantity(request, principal);

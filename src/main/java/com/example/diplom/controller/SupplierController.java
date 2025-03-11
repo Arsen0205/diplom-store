@@ -28,6 +28,7 @@ public class SupplierController {
     private OrderRepository orderRepository;
 
 
+    //Просмотр своего профиля
     @GetMapping("/{id}")
     public ResponseEntity<?> supplierOrders(@PathVariable("id") Long userId, Principal principal){
         Supplier currentUser = (Supplier)productService.getUserByPrincipal(principal);

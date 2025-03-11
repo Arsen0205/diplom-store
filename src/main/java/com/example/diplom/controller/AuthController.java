@@ -14,12 +14,14 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private AuthService authService;
 
+    //Регистрация нового пользователя
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@Valid @RequestBody RegisterDtoRequest request){
         authService.register(request);
         return ResponseEntity.ok("Вы успешно зарегистрировались!");
     }
 
+    //Авторизация пользователя
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@Valid @RequestBody LoginDtoRequest request){
         authService.login(request);

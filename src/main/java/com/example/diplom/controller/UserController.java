@@ -1,6 +1,7 @@
 package com.example.diplom.controller;
 
 import com.example.diplom.models.Client;
+import com.example.diplom.models.Product;
 import com.example.diplom.models.Supplier;
 import com.example.diplom.repository.ClientRepository;
 import com.example.diplom.repository.SupplierRepository;
@@ -24,6 +25,7 @@ public class UserController {
     private SupplierRepository supplierRepository;
 
 
+    //Просмотр профиля пользователя
     @GetMapping("/{id}")
     public ResponseEntity<?> userInfo(@PathVariable("id") Long id){
         Optional<Client> clientOptional = clientRepository.findById(id);
