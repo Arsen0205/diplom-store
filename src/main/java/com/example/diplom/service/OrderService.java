@@ -1,6 +1,7 @@
 package com.example.diplom.service;
 
 import com.example.diplom.dto.request.CreateOrderDtoRequest;
+import com.example.diplom.dto.response.OrderClientDtoResponse;
 import com.example.diplom.models.*;
 import com.example.diplom.models.enums.OrderStatus;
 import com.example.diplom.repository.*;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @AllArgsConstructor
+@Transactional
 public class OrderService {
     private final CartRepository cartRepository;
     private final OrderRepository orderRepository;
@@ -29,7 +31,10 @@ public class OrderService {
 
     @Transactional
     public void createdOrder(Principal principal, CreateOrderDtoRequest request){
-        Cart cart = cartRepository.findByClientId(getUserByPrincipal(principal).getId()).orElseThrow(()-> new IllegalArgumentException("Корзина пуста"));
+        Cart cart = cartRepository.findByClientId(getUserByPrincipal(principal).getId())
+                .orElseThrow(()-> new IllegalArgumentException("Корзина пуста"));
+        Client client = clientRepository.findById(getUserByPrincipal(principal).getId())
+                .orElseThrow(()->new RuntimeException("Пользователя с таким айди не существует"));
 
         if (cart.getItems().isEmpty()){
             throw new IllegalArgumentException("Корзина пустая");
@@ -53,6 +58,7 @@ public class OrderService {
                     .address(request.getAddress())
                     .city(request.getCity())
                     .orderItems(new ArrayList<>())
+                    .client(client)
                     .build();
 
             Order savedOrder = orderRepository.save(newOrder);
@@ -104,6 +110,23 @@ public class OrderService {
         // Очищаем корзину после оформления заказа
         cartRepository.delete(cart);
 
+    }
+
+    @Transactional
+    public List<OrderClientDtoResponse> getOrdersByClient(Principal principal){
+        Client client = clientRepository.findById(getUserByPrincipal(principal).getId())
+                .orElseThrow(()-> new RuntimeException("Пользователя с таким id не существует"));
+
+        List<Order> orders = orderRepository.findByClient(client);
+
+        return orders.stream()
+                .map(order -> new OrderClientDtoResponse(
+                        order.getId(),
+                        order.getStatus(),
+                        order.getTotalCost(),
+                        order.getDateTime()
+                ))
+                .toList();
     }
 
 

@@ -4,10 +4,7 @@ package com.example.diplom.models;
 import com.example.diplom.models.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name="orders")
 @Builder
+@ToString(exclude = {"orderItems", "client", "supplier"})
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,4 +55,8 @@ public class Order {
     @ManyToOne
     @JoinColumn(name="supplier_id", nullable = false)
     private Supplier supplier;
+
+    @ManyToOne
+    @JoinColumn(name = "client_id", nullable = false)
+    private Client client;
 }

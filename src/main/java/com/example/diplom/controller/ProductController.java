@@ -25,12 +25,14 @@ public class ProductController {
     private ProductService productService;
     private ProductRepository productRepository;
 
+    //Список всех продуктов
     @GetMapping
     public ResponseEntity<List<Product>> product(Principal principal){
         List<Product> products = productRepository.findAll();
         return ResponseEntity.ok(products);
     }
 
+    //Создание продукта
     @PostMapping("/create")
     public ResponseEntity<Product> createProduct(
             @RequestParam("title") String title,
@@ -51,6 +53,7 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
 
+    //Информация о продукте
     @GetMapping("/{id}")
     public ResponseEntity<ProductDtoResponse> productInfo(@PathVariable Long id, Principal principal){
         Product product = productRepository.findById(id).orElseThrow(()-> new RuntimeException("Товара с таким id нет: " + id));
@@ -67,6 +70,7 @@ public class ProductController {
        return ResponseEntity.ok(response);
     }
 
+    //Удаление продукта
     @PostMapping("/delete/{id}")
     private ResponseEntity<String> deleteProduct(@PathVariable("id") Long id, Principal principal){
         Product product = productRepository.findById(id).orElseThrow(()->new RuntimeException("Продукта нет"));

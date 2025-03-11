@@ -30,6 +30,7 @@ public class OrderController {
     private OrderRepository orderRepository;
     private OrderItemRepository orderItemRepository;
 
+    //Проверка корзины перед оформлением заказа
     @GetMapping("/checkout")
     public ResponseEntity<String> checkoutPage(Principal principal) {
         Cart cart = cartRepository.findByClientId(orderService.getUserByPrincipal(principal).getId()).orElse(new Cart());
@@ -42,6 +43,7 @@ public class OrderController {
                 .body("Корзина готова к оформлению");
     }
 
+    //Создание заказа
     @PostMapping("/create")
     public ResponseEntity<String> orderCreate(@RequestBody CreateOrderDtoRequest request, Principal principal){
         orderService.createdOrder(principal, request);
@@ -50,6 +52,7 @@ public class OrderController {
                 .body("Заказ успешно оформлен");
     }
 
+    //Информация о заказе
     @GetMapping("/info/{id}")
     public ResponseEntity<?> orderInfo(@PathVariable("id") Long id, Principal principal){
         Object currentUser = productService.getUserByPrincipal(principal);
