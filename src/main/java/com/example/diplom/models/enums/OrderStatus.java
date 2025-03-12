@@ -6,6 +6,5 @@ public enum OrderStatus {
     SHIPPED,    // В пути
     DELIVERED,  // Доставлен
     CANCELLED,  // Отменен
-    COMPLETE,   // Подтверждение
     PAID,       // Оплачен
 }

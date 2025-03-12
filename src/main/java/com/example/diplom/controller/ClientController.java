@@ -61,6 +61,7 @@ public class ClientController {
                 .body("Клиент не найден");
     }
 
+    //Просмотр и отслеживание заказов пользователя
     @GetMapping("/my/orders")
     public ResponseEntity<List<OrderClientDtoResponse>> getClientOrders(Principal principal){
         List<OrderClientDtoResponse> responses = orderService.getOrdersByClient(principal);
