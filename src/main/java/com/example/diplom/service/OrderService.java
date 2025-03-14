@@ -8,6 +8,8 @@ import com.example.diplom.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -28,6 +30,7 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final ClientRepository clientRepository;
     private final SupplierRepository supplierRepository;
+    private final ProductService productService;
 
     @Transactional
     public void createdOrder(Principal principal, CreateOrderDtoRequest request){
@@ -88,7 +91,7 @@ public class OrderService {
                 orderItems.add(orderItem);
 
                 // Уменьшаем количество товара
-                product.setQuantity(product.getQuantity() - cartItem.getQuantity());
+                //product.setQuantity(product.getQuantity() - cartItem.getQuantity());
                 productRepository.save(product);
             }
 
@@ -129,6 +132,100 @@ public class OrderService {
                 .toList();
     }
 
+    public ResponseEntity<String> confirmedOrder(Long id, Principal principal){
+        Order order = orderRepository.findById(id)
+                .orElseThrow(()-> new RuntimeException("Такого заказа не существует"));
+
+        Object currentUser = productService.getUserByPrincipal(principal);
+
+        if(currentUser instanceof Supplier){
+            Supplier supplier = (Supplier)productService.getUserByPrincipal(principal);
+            if (supplier.getId().equals(order.getSupplier().getId())){
+                for (OrderItem item: order.getOrderItems()){
+                    Product product = item.getProduct();
+                    product.setQuantity(product.getQuantity() - item.getQuantity());
+                    productRepository.save(product);
+                }
+                order.setStatus(OrderStatus.CONFIRMED);
+                orderRepository.save(order);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body("Вы приняли заказ");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("У вас нет прав, чтобы принять заказ");
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Ошибка при принятии заказа");
+    }
+
+    public ResponseEntity<String> cancelledOrder(Long id, Principal principal){
+        Object currentUser = productService.getUserByPrincipal(principal);
+        Order order = orderRepository.findById(id).
+                orElseThrow(()-> new RuntimeException("Такого заказа не существует"));
+
+        if (currentUser instanceof Client){
+            Client client = (Client) productService.getUserByPrincipal(principal);
+            if (order.getClient().getId().equals(client.getId())){
+                order.setStatus(OrderStatus.CANCELLED);
+                orderRepository.save(order);
+                return ResponseEntity.ok("Заказ отменен клиентом");
+            }
+
+        }else if(currentUser instanceof Supplier) {
+            Supplier supplier = (Supplier) productService.getUserByPrincipal(principal);
+            if (order.getSupplier().getId().equals(supplier.getId())) {
+                order.setStatus(OrderStatus.CANCELLED);
+                orderRepository.save(order);
+                return ResponseEntity.ok("Заказ отменен поставщиком");
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Ошибка: неизвестный пользователь");
+    }
+
+    public ResponseEntity<String> shippedOrder(Long id, Principal principal){
+        Object currentUser = productService.getUserByPrincipal(principal);
+        Order order = orderRepository.findById(id).
+                orElseThrow(()-> new RuntimeException("Такого заказа не существует"));
+
+        if (currentUser instanceof Supplier){
+            Supplier supplier = (Supplier) productService.getUserByPrincipal(principal);
+            if (order.getSupplier().getId().equals(supplier.getId())){
+                order.setStatus(OrderStatus.SHIPPED);
+                orderRepository.save(order);
+                return ResponseEntity.ok("Статус заказа изменен");
+            }
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("У вас нет прав на данную операцию");
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Ошибка: неизвестный пользователь");
+    }
+
+    public ResponseEntity<String> deliveredOrder(Long id, Principal principal){
+        Object currentUser = productService.getUserByPrincipal(principal);
+        Order order = orderRepository.findById(id).
+                orElseThrow(()-> new RuntimeException("Такого заказа не существует"));
+
+        if (currentUser instanceof Supplier){
+            Supplier supplier = (Supplier) productService.getUserByPrincipal(principal);
+            if (order.getSupplier().getId().equals(supplier.getId())){
+                order.setStatus(OrderStatus.DELIVERED);
+                orderRepository.save(order);
+                return ResponseEntity.ok("Статус заказа изменен");
+            }
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("У вас нет прав на данную операцию");
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Ошибка: неизвестный пользователь");
+    }
 
     public Client getUserByPrincipal(Principal principal) {
         if (principal == null) {
