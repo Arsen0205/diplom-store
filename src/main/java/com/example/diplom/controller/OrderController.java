@@ -3,7 +3,6 @@ package com.example.diplom.controller;
 
 import com.example.diplom.dto.request.CreateOrderDtoRequest;
 import com.example.diplom.models.*;
-import com.example.diplom.models.enums.OrderStatus;
 import com.example.diplom.repository.*;
 import com.example.diplom.service.OrderService;
 import com.example.diplom.service.ProductService;
@@ -16,7 +15,6 @@ import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -54,56 +52,39 @@ public class OrderController {
     //Информация о заказе
     @GetMapping("/info/{id}")
     public ResponseEntity<?> orderInfo(@PathVariable("id") Long id, Principal principal){
-        Object currentUser = productService.getUserByPrincipal(principal);
+        //Object currentUser = productService.getUserByPrincipal(principal);
         Supplier supplier = supplierRepository.findByLogin(principal.getName()).orElseThrow(()-> new IllegalArgumentException("Пользователя не существует"));
         Order order = orderRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("Такого заказа не существует"));
 
-        Map<String, Object> response = new HashMap<>();
-        List<OrderItem> items = orderItemRepository.findByOrder(order);
+        if (supplier.getId().equals(order.getSupplier().getId())) {
+            Map<String, Object> response = new HashMap<>();
+            //List<OrderItem> items = orderItemRepository.findByOrder(order);
 
-        response.put("order", order);
+            response.put("order", order);
+            return ResponseEntity.ok(response);
+        }
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Ошибка просмотра заказа: вы не можете смотреть чужие заказы");
     }
 
     @GetMapping("/confirmed/{id}")
-    public ResponseEntity<String> confirmedOrder(@PathVariable("id") Long id, Principal principal){
-        Order order = orderRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Такого заказа не существует"));
-
-        Object currentUser = productService.getUserByPrincipal(principal);
-
-        if(currentUser instanceof Supplier){
-            Supplier supplier = (Supplier)productService.getUserByPrincipal(principal);
-            if (supplier.getId().equals(order.getSupplier().getId())){
-                order.setStatus(OrderStatus.CONFIRMED);
-                orderRepository.save(order);
-                return ResponseEntity.status(HttpStatus.OK)
-                        .body("Вы приняли заказ");
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("У вас нет прав, чтобы принять заказ");
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Ошибка при принятии заказа");
+    public ResponseEntity<?> confirmedOrder(@PathVariable("id") Long id, Principal principal){
+        return ResponseEntity.ok(orderService.confirmedOrder(id, principal));
     }
 
     @GetMapping("/cancelled/{id}")
-    public ResponseEntity<String> cancelledOrder(@PathVariable("id") Long id, Principal principal){
-        Object currentUser = productService.getUserByPrincipal(principal);
-        Order order = orderRepository.findById(id).
-                orElseThrow(()-> new RuntimeException("Такого заказа не существует"));
-        order.setStatus(OrderStatus.CANCELLED);
-        orderRepository.save(order);
+    public ResponseEntity<?> cancelledOrder(@PathVariable("id") Long id, Principal principal){
+        return ResponseEntity.ok(orderService.cancelledOrder(id, principal));
+    }
 
-        if (currentUser instanceof Client){
-            return ResponseEntity.ok("Заказ отменен клиентом");
-        }else if(currentUser instanceof Supplier) {
-            return ResponseEntity.ok("Заказ отменен поставщиком");
-        }
+    @GetMapping("/shipped/{id}")
+    public ResponseEntity<?> shippedOrder(@PathVariable("id") Long id, Principal principal){
+        return ResponseEntity.ok(orderService.shippedOrder(id,principal));
+    }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Ошибка: неизвестный пользователь");
+    @GetMapping("/delivered/{id}")
+    public ResponseEntity<?> deliveredOrder(@PathVariable("id") Long id, Principal principal){
+        return ResponseEntity.ok(orderService.deliveredOrder(id, principal));
     }
 }
