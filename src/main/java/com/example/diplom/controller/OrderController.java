@@ -5,6 +5,7 @@ import com.example.diplom.dto.request.CreateOrderDtoRequest;
 import com.example.diplom.models.*;
 import com.example.diplom.repository.*;
 import com.example.diplom.service.OrderService;
+import com.example.diplom.service.PayService;
 import com.example.diplom.service.ProductService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ public class OrderController {
     private SupplierRepository supplierRepository;
     private OrderRepository orderRepository;
     private OrderItemRepository orderItemRepository;
+    private PayService payService;
 
     //Проверка корзины перед оформлением заказа
     @GetMapping("/checkout")
@@ -68,23 +70,30 @@ public class OrderController {
                 .body("Ошибка просмотра заказа: вы не можете смотреть чужие заказы");
     }
 
-    @GetMapping("/confirmed/{id}")
+    @PostMapping("/confirmed/{id}")
     public ResponseEntity<?> confirmedOrder(@PathVariable("id") Long id, Principal principal){
         return ResponseEntity.ok(orderService.confirmedOrder(id, principal));
     }
 
-    @GetMapping("/cancelled/{id}")
+    @PostMapping("/cancelled/{id}")
     public ResponseEntity<?> cancelledOrder(@PathVariable("id") Long id, Principal principal){
         return ResponseEntity.ok(orderService.cancelledOrder(id, principal));
     }
 
-    @GetMapping("/shipped/{id}")
+    @PostMapping("/shipped/{id}")
     public ResponseEntity<?> shippedOrder(@PathVariable("id") Long id, Principal principal){
         return ResponseEntity.ok(orderService.shippedOrder(id,principal));
     }
 
-    @GetMapping("/delivered/{id}")
+    @PostMapping("/delivered/{id}")
     public ResponseEntity<?> deliveredOrder(@PathVariable("id") Long id, Principal principal){
         return ResponseEntity.ok(orderService.deliveredOrder(id, principal));
     }
+
+    @PostMapping("/pay/{id}")
+    public ResponseEntity<byte[]> payOrder(@PathVariable("id") Long id, Principal principal) {
+        return payService.payForOrder(id, principal);
+    }
+
+
 }
