@@ -2,6 +2,8 @@ package com.example.diplom.service;
 
 
 import com.example.diplom.dto.request.CreateProductDtoRequest;
+import com.example.diplom.dto.response.MainDtoResponse;
+import com.example.diplom.dto.response.ProductDtoResponse;
 import com.example.diplom.models.Client;
 import com.example.diplom.models.Image;
 import com.example.diplom.models.Product;
@@ -67,6 +69,17 @@ public class ProductService {
         return productRepository.save(product);
     }
 
+    public List<MainDtoResponse> getAllProduct(){
+        List<Product> products = productRepository.findAll();
+
+        return products.stream()
+                .map(product -> new MainDtoResponse(
+                        product.getId(),
+                        product.getTitle(),
+                        product.getPrice()
+                ))
+                .toList();
+    }
 
     public Object getUserByPrincipal(Principal principal) {
         if (principal == null) {

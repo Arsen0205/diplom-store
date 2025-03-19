@@ -3,7 +3,6 @@ package com.example.diplom.controller;
 
 import com.example.diplom.dto.response.OrderClientDtoResponse;
 import com.example.diplom.dto.response.OrderItemClientDtoResponse;
-import com.example.diplom.dto.response.OrderItemDtoResponse;
 import com.example.diplom.models.Cart;
 import com.example.diplom.models.Client;
 import com.example.diplom.repository.CartRepository;
@@ -70,6 +69,7 @@ public class ClientController {
         return ResponseEntity.ok(responses);
     }
 
+    //Просмотр содержимого заказа
     @GetMapping("/my/orders/{id}")
     public ResponseEntity<List<OrderItemClientDtoResponse>> ordersInfo(@PathVariable("id") Long id, Principal principal){
         List<OrderItemClientDtoResponse> responses = orderService.ordersInfo(id, principal);
