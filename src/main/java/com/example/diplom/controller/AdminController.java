@@ -48,6 +48,6 @@ public class AdminController {
 
     @PostMapping("/products/delete/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable("id") Long id){
-        return ResponseEntity.ok();
+        return ResponseEntity.ok(adminService.deleteProduct(id));
     }
 }
