@@ -1,7 +1,6 @@
 package com.example.diplom.controller;
 
 import com.example.diplom.models.Client;
-import com.example.diplom.models.Product;
 import com.example.diplom.models.Supplier;
 import com.example.diplom.repository.ClientRepository;
 import com.example.diplom.repository.SupplierRepository;

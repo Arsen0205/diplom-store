@@ -3,15 +3,13 @@ package com.example.diplom.models;
 
 import com.example.diplom.models.enums.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 
 @Entity
 @Data
-@Table(name="users")
-public class User {
+@Table(name="admins")
+public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
