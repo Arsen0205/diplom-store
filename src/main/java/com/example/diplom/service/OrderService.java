@@ -2,6 +2,8 @@ package com.example.diplom.service;
 
 import com.example.diplom.dto.request.CreateOrderDtoRequest;
 import com.example.diplom.dto.response.OrderClientDtoResponse;
+import com.example.diplom.dto.response.OrderItemClientDtoResponse;
+import com.example.diplom.dto.response.OrderItemDtoResponse;
 import com.example.diplom.models.*;
 import com.example.diplom.models.enums.OrderStatus;
 import com.example.diplom.repository.*;
@@ -128,6 +130,29 @@ public class OrderService {
                         order.getStatus(),
                         order.getTotalCost(),
                         order.getDateTime()
+                ))
+                .toList();
+    }
+
+    @Transactional
+    public List<OrderItemClientDtoResponse> ordersInfo(Long id, Principal principal){
+        Client client = clientRepository.findById(getUserByPrincipal(principal).getId())
+                .orElseThrow(()-> new RuntimeException("Пользователь с таким id не существует"));
+
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Такого заказа не существует"));
+
+        List<OrderItem> items = orderItemRepository.findByOrder(order);
+
+        if(!client.getId().equals(order.getClient().getId())){
+            throw new RuntimeException("Доступ запрещен: заказ не принадлежит данному пользователю");
+        }
+
+        return items.stream()
+                .map(orderItem -> new OrderItemClientDtoResponse(
+                        orderItem.getProduct().getTitle(),
+                        orderItem.getQuantity(),
+                        orderItem.getSellingPrice()
                 ))
                 .toList();
     }
