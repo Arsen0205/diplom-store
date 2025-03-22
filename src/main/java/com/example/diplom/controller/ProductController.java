@@ -3,6 +3,7 @@ package com.example.diplom.controller;
 
 import com.example.diplom.dto.request.CreateProductDtoRequest;
 import com.example.diplom.dto.response.ProductDtoResponse;
+import com.example.diplom.dto.response.ProductInfoMainDtoResponse;
 import com.example.diplom.models.Product;
 import com.example.diplom.models.Supplier;
 import com.example.diplom.repository.ProductRepository;
@@ -55,19 +56,9 @@ public class ProductController {
 
     //Информация о продукте
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDtoResponse> productInfo(@PathVariable Long id, Principal principal){
-        Product product = productRepository.findById(id).orElseThrow(()-> new RuntimeException("Товара с таким id нет: " + id));
-
-       ProductDtoResponse response = new ProductDtoResponse(
-               product.getId(),
-               product.getTitle(),
-               product.getQuantity(),
-               product.getPrice(),
-               product.getSellingPrice(),
-               product.getSupplier().getId()
-       );
-
-       return ResponseEntity.ok(response);
+    public ResponseEntity<ProductInfoMainDtoResponse> productInfo(@PathVariable Long id, Principal principal){
+        ProductInfoMainDtoResponse response = productService.productInfo(id);
+        return ResponseEntity.ok(response);
     }
 
     //Удаление продукта

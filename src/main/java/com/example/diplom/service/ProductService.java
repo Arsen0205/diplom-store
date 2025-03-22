@@ -4,6 +4,7 @@ package com.example.diplom.service;
 import com.example.diplom.dto.request.CreateProductDtoRequest;
 import com.example.diplom.dto.response.MainDtoResponse;
 import com.example.diplom.dto.response.ProductDtoResponse;
+import com.example.diplom.dto.response.ProductInfoMainDtoResponse;
 import com.example.diplom.models.Client;
 import com.example.diplom.models.Image;
 import com.example.diplom.models.Product;
@@ -79,6 +80,21 @@ public class ProductService {
                         product.getPrice()
                 ))
                 .toList();
+    }
+
+    public ProductInfoMainDtoResponse productInfo(Long id){
+        Product product = productRepository.findById(id)
+                .orElseThrow(()-> new RuntimeException("Товар не найден"));
+
+        ProductInfoMainDtoResponse response = new ProductInfoMainDtoResponse(
+                product.getId(),
+                product.getTitle(),
+                product.getPrice(),
+                product.getQuantity(),
+                product.getSupplier().getLogin()
+        );
+
+        return response;
     }
 
     public Object getUserByPrincipal(Principal principal) {
