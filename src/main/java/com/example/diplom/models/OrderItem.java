@@ -19,11 +19,18 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "title")
+    private String title;
+
     @Column(name="quantity")
     private int quantity;
 
+    @Column(name = "productSku")
+    private Long productSku;
+
     @ManyToOne
-    @JoinColumn(name="product_id", nullable = false)
+    @JoinColumn(name="product_id")
+    @JsonBackReference
     private Product product;
 
     @ManyToOne

@@ -2,10 +2,8 @@ package com.example.diplom.controller;
 
 
 import com.example.diplom.dto.request.CreateProductDtoRequest;
-import com.example.diplom.dto.response.ProductDtoResponse;
 import com.example.diplom.dto.response.ProductInfoMainDtoResponse;
 import com.example.diplom.models.Product;
-import com.example.diplom.models.Supplier;
 import com.example.diplom.repository.ProductRepository;
 import com.example.diplom.service.ProductService;
 import lombok.AllArgsConstructor;
@@ -35,7 +33,7 @@ public class ProductController {
 
     //Создание продукта
     @PostMapping("/create")
-    public ResponseEntity<Product> createProduct(
+    public ResponseEntity<String> createProduct(
             @RequestParam("title") String title,
             @RequestParam("quantity") int quantity,
             @RequestParam("price") BigDecimal price,
@@ -49,28 +47,23 @@ public class ProductController {
         request.setPrice(price);
         request.setSellingPrice(sellingPrice);
         request.setImages(images);
+
         Product product = productService.createProduct(request, principal);
-        System.out.println(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(product);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("Объявление создано!");
     }
 
     //Информация о продукте
     @GetMapping("/{id}")
-    public ResponseEntity<ProductInfoMainDtoResponse> productInfo(@PathVariable Long id, Principal principal){
+    public ResponseEntity<ProductInfoMainDtoResponse> productInfo(@PathVariable Long id){
         ProductInfoMainDtoResponse response = productService.productInfo(id);
         return ResponseEntity.ok(response);
     }
 
     //Удаление продукта
-    @PostMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     private ResponseEntity<String> deleteProduct(@PathVariable("id") Long id, Principal principal){
-        Product product = productRepository.findById(id).orElseThrow(()->new RuntimeException("Продукта нет"));
-        Supplier currentUser = (Supplier) productService.getUserByPrincipal(principal);
-        if(!product.getSupplier().getId().equals(currentUser.getId())){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Вы не можете удалить этот продукт");
-        }
-        productRepository.deleteById(id);
+        productService.deleteProduct(id, principal);
         return ResponseEntity.status(HttpStatus.OK)
                 .body("Продукт успешно удален");
     }

@@ -83,6 +83,8 @@ public class OrderService {
                 OrderItem orderItem = OrderItem.builder()
                         .order(savedOrder)
                         .product(product)
+                        .productSku(product.getId())
+                        .title(product.getTitle())
                         .quantity(cartItem.getQuantity())
                         .costPrice(product.getPrice())
                         .sellingPrice(product.getSellingPrice())
