@@ -14,6 +14,8 @@ import com.example.diplom.repository.ImageRepository;
 import com.example.diplom.repository.ProductRepository;
 import com.example.diplom.repository.SupplierRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -95,6 +97,19 @@ public class ProductService {
         );
 
         return response;
+    }
+
+    public ResponseEntity<String> deleteProduct(Long id, Principal principal){
+        Product product = productRepository.findById(id).orElseThrow(()->new RuntimeException("Продукта нет"));
+        Supplier currentUser = (Supplier)getUserByPrincipal(principal);
+        if(!product.getSupplier().getId().equals(currentUser.getId())){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Вы не можете удалить объявление другого поставщика");
+        }
+        productRepository.deleteById(id);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body("Объявление успешно удалено");
     }
 
     public Object getUserByPrincipal(Principal principal) {
