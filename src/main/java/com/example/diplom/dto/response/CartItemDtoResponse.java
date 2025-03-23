@@ -7,9 +7,10 @@ import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
-public class MainDtoResponse {
-    private Long id;
+public class CartItemDtoResponse {
+    private Long productId;
     private String title;
-    private BigDecimal price;
     private int quantity;
+    private BigDecimal price;
+    private BigDecimal total;
 }
