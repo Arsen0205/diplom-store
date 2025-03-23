@@ -79,7 +79,8 @@ public class ProductService {
                 .map(product -> new MainDtoResponse(
                         product.getId(),
                         product.getTitle(),
-                        product.getPrice()
+                        product.getPrice(),
+                        product.getQuantity()
                 ))
                 .toList();
     }

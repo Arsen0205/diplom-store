@@ -152,9 +152,12 @@ public class OrderService {
 
         return items.stream()
                 .map(orderItem -> new OrderItemClientDtoResponse(
-                        orderItem.getProduct().getTitle(),
+                        orderItem.getTitle(),
                         orderItem.getQuantity(),
-                        orderItem.getSellingPrice()
+                        orderItem.getCostPrice(),
+                        orderItem.getProductSku(),
+                        orderItem.getCostPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity()))
+
                 ))
                 .toList();
     }

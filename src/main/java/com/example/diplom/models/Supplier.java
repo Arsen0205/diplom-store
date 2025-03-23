@@ -40,7 +40,7 @@ public class Supplier implements UserDetails {
     private String loginTelegram;
 
     //Чат-айди телеграмма
-    @Column(name = "chat_id", nullable = true, unique = true)
+    @Column(name = "chat_id", unique = true)
     private String chatId;
 
     //Разрешен ли доступ или нет

@@ -60,7 +60,6 @@ public class OrderController {
 
         if (supplier.getId().equals(order.getSupplier().getId())) {
             Map<String, Object> response = new HashMap<>();
-            //List<OrderItem> items = orderItemRepository.findByOrder(order);
 
             response.put("order", order);
             return ResponseEntity.ok(response);

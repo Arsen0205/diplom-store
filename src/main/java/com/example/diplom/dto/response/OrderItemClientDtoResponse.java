@@ -11,4 +11,6 @@ public class OrderItemClientDtoResponse {
     private String title;
     private int quantity;
     private BigDecimal sellingPrice;
+    private Long productSku;
+    private BigDecimal totalPrice;
 }
