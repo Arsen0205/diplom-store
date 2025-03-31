@@ -1,9 +1,11 @@
 package com.example.diplom.controller;
 
+import com.example.diplom.dto.response.UserInfoDtoResponse;
 import com.example.diplom.models.Client;
 import com.example.diplom.models.Supplier;
 import com.example.diplom.repository.ClientRepository;
 import com.example.diplom.repository.SupplierRepository;
+import com.example.diplom.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,26 +24,11 @@ import java.util.Optional;
 public class UserController {
     private ClientRepository clientRepository;
     private SupplierRepository supplierRepository;
-
+    private UserService  userService;
 
     //Просмотр профиля пользователя
     @GetMapping("/{id}")
-    public ResponseEntity<?> userInfo(@PathVariable("id") Long id){
-        Optional<Client> clientOptional = clientRepository.findById(id);
-        Map<String, Object> response = new HashMap<>();
-        if(clientOptional.isPresent()){
-            Client client = clientOptional.get();
-            response.put("client", client);
-            return ResponseEntity.ok(response);
-        }
-        Optional<Supplier> supplierOptional = supplierRepository.findById(id);
-        if (supplierOptional.isPresent()){
-            Supplier supplier = supplierOptional.get();
-            response.put("supplier", supplier);
-            return ResponseEntity.ok(response);
-        }
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("Пользователя не существует!");
+    public UserInfoDtoResponse userInfo(@PathVariable("id") Long id){
+        return userService.userInfo(id);
     }
 }
