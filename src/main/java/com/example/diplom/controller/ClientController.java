@@ -42,6 +42,7 @@ public class ClientController {
         return clientService.clientInfo(userId, principal);
     }
 
+    //Просмотр корзины
     @GetMapping("/cart")
     public ResponseEntity<?> viewCart(Principal principal){
         return clientService.getCart(principal);
