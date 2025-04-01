@@ -1,27 +1,20 @@
 package com.example.diplom.controller;
 
 
-import com.example.diplom.dto.response.CartDtoResponse;
 import com.example.diplom.dto.response.ClientsDtoResponse;
 import com.example.diplom.dto.response.OrderClientDtoResponse;
 import com.example.diplom.dto.response.OrderItemClientDtoResponse;
-import com.example.diplom.models.Cart;
-import com.example.diplom.models.Client;
-import com.example.diplom.repository.CartRepository;
-import com.example.diplom.repository.ClientRepository;
 import com.example.diplom.service.ClientService;
 import com.example.diplom.service.OrderService;
-import com.example.diplom.service.ProductService;
+
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
 
 @RestController
 @AllArgsConstructor

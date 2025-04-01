@@ -3,7 +3,6 @@ package com.example.diplom.service;
 import com.example.diplom.dto.request.CreateOrderDtoRequest;
 import com.example.diplom.dto.response.OrderClientDtoResponse;
 import com.example.diplom.dto.response.OrderItemClientDtoResponse;
-import com.example.diplom.dto.response.OrderItemDtoResponse;
 import com.example.diplom.models.*;
 import com.example.diplom.models.enums.OrderStatus;
 import com.example.diplom.repository.*;
