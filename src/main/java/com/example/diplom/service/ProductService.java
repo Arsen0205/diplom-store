@@ -3,7 +3,6 @@ package com.example.diplom.service;
 
 import com.example.diplom.dto.request.CreateProductDtoRequest;
 import com.example.diplom.dto.response.MainDtoResponse;
-import com.example.diplom.dto.response.ProductDtoResponse;
 import com.example.diplom.dto.response.ProductInfoMainDtoResponse;
 import com.example.diplom.models.Client;
 import com.example.diplom.models.Image;

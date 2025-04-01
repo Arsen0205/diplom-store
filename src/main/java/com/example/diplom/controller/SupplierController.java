@@ -1,10 +1,10 @@
 package com.example.diplom.controller;
 
 
+import com.example.diplom.dto.response.OrderItemSupplierDtoResponse;
+import com.example.diplom.dto.response.OrderSupplierDtoResponse;
 import com.example.diplom.dto.response.ProductDtoResponse;
 import com.example.diplom.dto.response.SuppliersDtoResponse;
-import com.example.diplom.repository.*;
-import com.example.diplom.service.ProductService;
 import com.example.diplom.service.SupplierService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,10 +30,24 @@ public class SupplierController {
         return supplierService.supplierInfo(userId, principal);
     }
 
-    @GetMapping("/my/product")
+    //Просмотр своих продуктов
+    @GetMapping("/my/products")
     public ResponseEntity<List<ProductDtoResponse>> getProductSupplier(Principal principal){
         List<ProductDtoResponse> responses = supplierService.getProductSupplier(principal);
         return ResponseEntity.ok(responses);
     }
 
+    //Просмотр своих заказов
+    @GetMapping("/my/orders")
+    public ResponseEntity<List<OrderSupplierDtoResponse>> getOrderSupplier(Principal principal){
+        List<OrderSupplierDtoResponse> responses = supplierService.getSupplierOrders(principal);
+        return ResponseEntity.ok(responses);
+    }
+
+    //Просмотр деталей заказа
+    @GetMapping("/my/orders/{id}")
+    public ResponseEntity<List<OrderItemSupplierDtoResponse>> orderInfo(@PathVariable Long id, Principal principal){
+        List<OrderItemSupplierDtoResponse> responses = supplierService.orderInfo(id, principal);
+        return ResponseEntity.ok(responses);
+    }
 }

@@ -2,14 +2,12 @@ package com.example.diplom.service;
 
 import com.example.diplom.dto.request.LoginDtoRequest;
 import com.example.diplom.dto.request.RegisterDtoRequest;
-import com.example.diplom.dto.response.Response;
 import com.example.diplom.models.Client;
 import com.example.diplom.models.Supplier;
 import com.example.diplom.repository.ClientRepository;
 import com.example.diplom.repository.SupplierRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

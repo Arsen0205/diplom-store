@@ -7,7 +7,6 @@ import com.example.diplom.repository.ClientRepository;
 import com.example.diplom.repository.SupplierRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
