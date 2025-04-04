@@ -32,6 +32,7 @@ public class OrderService {
     private final ClientRepository clientRepository;
     private final SupplierRepository supplierRepository;
     private final ProductService productService;
+    private final TelegramNotificationService telegramNotificationService;
 
     @Transactional
     public void createdOrder(Principal principal, CreateOrderDtoRequest request){
@@ -109,6 +110,7 @@ public class OrderService {
             savedOrder.setTotalPrice(totalPrice);
             savedOrder.setProfit(profit);
 
+            telegramNotificationService.sendOrderNotification(supplier.getChatId(), client.getChatId(), savedOrder);
 
             createdOrders.add(orderRepository.save(savedOrder));
         }
@@ -161,6 +163,7 @@ public class OrderService {
                 .toList();
     }
 
+    @Transactional
     public ResponseEntity<String> confirmedOrder(Long id, Principal principal){
         Order order = orderRepository.findById(id)
                 .orElseThrow(()-> new RuntimeException("Такого заказа не существует"));
@@ -177,6 +180,7 @@ public class OrderService {
                 }
                 order.setStatus(OrderStatus.CONFIRMED);
                 orderRepository.save(order);
+                telegramNotificationService.acceptOrder(id);
                 return ResponseEntity.status(HttpStatus.OK)
                         .body("Вы приняли заказ");
             }
@@ -188,6 +192,7 @@ public class OrderService {
                 .body("Ошибка при принятии заказа");
     }
 
+    @Transactional
     public ResponseEntity<String> cancelledOrder(Long id, Principal principal){
         Object currentUser = productService.getUserByPrincipal(principal);
         Order order = orderRepository.findById(id).
@@ -198,6 +203,7 @@ public class OrderService {
             if (order.getClient().getId().equals(client.getId())){
                 order.setStatus(OrderStatus.CANCELLED);
                 orderRepository.save(order);
+                telegramNotificationService.rejectClient(id);
                 return ResponseEntity.ok("Заказ отменен клиентом");
             }
 
@@ -206,6 +212,7 @@ public class OrderService {
             if (order.getSupplier().getId().equals(supplier.getId())) {
                 order.setStatus(OrderStatus.CANCELLED);
                 orderRepository.save(order);
+                telegramNotificationService.rejectOrder(id);
                 return ResponseEntity.ok("Заказ отменен поставщиком");
             }
         }
@@ -214,6 +221,7 @@ public class OrderService {
                 .body("Ошибка: неизвестный пользователь");
     }
 
+    @Transactional
     public ResponseEntity<String> shippedOrder(Long id, Principal principal){
         Object currentUser = productService.getUserByPrincipal(principal);
         Order order = orderRepository.findById(id).
@@ -224,6 +232,7 @@ public class OrderService {
             if (order.getSupplier().getId().equals(supplier.getId())){
                 order.setStatus(OrderStatus.SHIPPED);
                 orderRepository.save(order);
+                telegramNotificationService.shippedOrder(id);
                 return ResponseEntity.ok("Статус заказа изменен");
             }
         }else {
@@ -235,6 +244,7 @@ public class OrderService {
                 .body("Ошибка: неизвестный пользователь");
     }
 
+    @Transactional
     public ResponseEntity<String> deliveredOrder(Long id, Principal principal){
         Object currentUser = productService.getUserByPrincipal(principal);
         Order order = orderRepository.findById(id).
@@ -245,6 +255,7 @@ public class OrderService {
             if (order.getSupplier().getId().equals(supplier.getId())){
                 order.setStatus(OrderStatus.DELIVERED);
                 orderRepository.save(order);
+                telegramNotificationService.deliveredOrder(id);
                 return ResponseEntity.ok("Статус заказа изменен");
             }
         }else {
