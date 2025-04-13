@@ -30,9 +30,9 @@ public class ClientController {
     }
 
     //Просмотр своего профиля
-    @GetMapping("/{id}")
-    public ResponseEntity<ClientsDtoResponse> userInfo(@PathVariable("id") Long userId, Principal principal) {
-        return clientService.clientInfo(userId, principal);
+    @GetMapping("/me")
+    public ResponseEntity<ClientsDtoResponse> userInfo(Principal principal) {
+        return clientService.clientInfo(principal);
     }
 
     //Просмотр корзины

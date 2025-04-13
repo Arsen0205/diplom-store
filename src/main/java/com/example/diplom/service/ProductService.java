@@ -38,7 +38,7 @@ public class ProductService {
     private final ImageRepository imageRepository;
     private final ClientRepository clientRepository;
 
-    public Product createProduct(CreateProductDtoRequest request, Principal principal) throws IOException {
+    public void createProduct(CreateProductDtoRequest request, Principal principal) throws IOException {
         Product product = new Product();
         product.setQuantity(request.getQuantity());
         product.setTitle(request.getTitle());
@@ -68,7 +68,7 @@ public class ProductService {
                 .orElse(null);
 
         product.setPreviewImageId(previewImageId);
-        return productRepository.save(product);
+        productRepository.save(product);
     }
 
     public List<MainDtoResponse> getAllProduct(){

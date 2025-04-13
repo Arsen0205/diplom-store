@@ -32,25 +32,17 @@ public class SupplierService {
     private final OrderItemRepository orderItemRepository;
 
 
-    public ResponseEntity<SuppliersDtoResponse> supplierInfo(Long id, Principal principal){
-        Supplier supplier = supplierRepository.findById(id)
-                .orElseThrow(()->new RuntimeException("Пользователь не найден"));
-
+    public ResponseEntity<SuppliersDtoResponse> supplierInfo(Principal principal){
         Supplier currentUser = getUserByPrincipal(principal);
 
-        if (!supplier.getId().equals(currentUser.getId())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Вы не можете посмотреть личную информацию чужого пользователя");
-        }
-
         SuppliersDtoResponse suppliersDtoResponse = new SuppliersDtoResponse(
-                supplier.getId(),
-                supplier.getLogin(),
-                supplier.getLoginTelegram(),
-                supplier.getChatId(),
-                supplier.isActive(),
-                supplier.getRole()
+                currentUser.getId(),
+                currentUser.getLogin(),
+                currentUser.getLoginTelegram(),
+                currentUser.getChatId(),
+                currentUser.isActive(),
+                currentUser.getRole()
         );
-
         return ResponseEntity.ok(suppliersDtoResponse);
     }
 

@@ -25,9 +25,9 @@ public class SupplierController {
 
 
     //Просмотр своего профиля
-    @GetMapping("/{id}")
-    public ResponseEntity<SuppliersDtoResponse> supplierOrders(@PathVariable("id") Long userId, Principal principal){
-        return supplierService.supplierInfo(userId, principal);
+    @GetMapping("/me")
+    public ResponseEntity<SuppliersDtoResponse> supplierOrders(Principal principal){
+        return supplierService.supplierInfo(principal);
     }
 
     //Просмотр своих продуктов
