@@ -3,6 +3,7 @@ package com.example.diplom.controller;
 import com.example.diplom.models.Order;
 import com.example.diplom.repository.OrderRepository;
 import com.example.diplom.service.OrderCheckService;
+import com.example.diplom.service.PayService;
 import com.example.diplom.service.TelegramNotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,15 +17,12 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 public class QrConfirmController {
-
     private final OrderRepository orderRepository;
-    private final TelegramNotificationService telegramNotificationService;
     private final OrderCheckService orderCheckService;
+    private final TelegramNotificationService telegramNotificationService;
 
     @GetMapping("/qr-confirm")
-    public ResponseEntity<String> confirmQr(
-            @RequestParam Long orderId
-    ) throws Exception {
+    public ResponseEntity<String> confirmQr(@RequestParam Long orderId) throws Exception {
         Optional<Order> orderOpt = orderRepository.findById(orderId);
         if (orderOpt.isEmpty()) return ResponseEntity.badRequest().body("Order not found");
 
@@ -38,7 +36,7 @@ public class QrConfirmController {
                 pdf,
                 "🧾 Спасибо за заказ №" + order.getId() + "!\nВаш чек прикреплён ниже 💙"
         );
-        pdf.delete(); // удалить временный файл
+        pdf.delete();// удалить временный файл
 
         return ResponseEntity.ok("Чек отправлен в Telegram");
     }

@@ -26,7 +26,7 @@ import java.io.File;
 public class OrderCheckService {
 
     public File generateOrderReceiptPdf(Order order) throws Exception {
-        String paymentLink = "https://cold-teeth-repeat.loca.lt/qr-confirm?orderId=" + order.getId(); // можно заменить на свой
+        String paymentLink = "https://swift-walls-grab.loca.lt/qr-confirm?orderId=" + order.getId(); // можно заменить на свой
 
         File file = File.createTempFile("receipt_order_" + order.getId(), ".pdf");
         PdfWriter writer = new PdfWriter(file);
@@ -51,6 +51,29 @@ public class OrderCheckService {
         Image qrImage = new Image(ImageDataFactory.create(qrBytes));
         doc.add(new Paragraph("Оплатите по QR-коду:").setFont(font));
         doc.add(qrImage);
+
+        doc.close();
+        return file;
+    }
+
+    public File generateOrderReceiptPdfForClient(Order order) throws Exception{
+        File file = File.createTempFile("receipt_order_" + order.getId(), ".pdf");
+        PdfWriter writer = new PdfWriter(file);
+        PdfDocument pdf = new PdfDocument(writer);
+        Document doc = new Document(pdf);
+
+        PdfFont font = PdfFontFactory.createFont("C:\\Windows\\Fonts\\arial.ttf");
+
+        doc.add(new Paragraph("Чек на оплату").setBold().setFontSize(14).setFont(font));
+        doc.add(new Paragraph("Заказ №: " + order.getId()).setFont(font));
+        doc.add(new Paragraph("Клиент: " + order.getClient().getLogin()).setFont(font));
+        doc.add(new Paragraph("Сумма: " + order.getTotalPrice() + "₽").setFont(font));
+        doc.add(new Paragraph(" "));
+
+        doc.add(new Paragraph("Состав заказа:").setFont(font));
+        for (OrderItem item : order.getOrderItems()) {
+            doc.add(new Paragraph("- " + item.getProduct().getTitle() + " x" + item.getQuantity()).setFont(font));
+        }
 
         doc.close();
         return file;
