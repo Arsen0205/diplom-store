@@ -2,6 +2,7 @@ package com.example.diplom.service;
 
 import com.example.diplom.dto.request.LoginDtoRequest;
 import com.example.diplom.dto.request.RegisterDtoRequest;
+import com.example.diplom.dto.response.UserInfoDtoResponse;
 import com.example.diplom.models.Client;
 import com.example.diplom.models.Supplier;
 import com.example.diplom.repository.ClientRepository;
@@ -21,12 +22,14 @@ public class AuthService {
     private final ClientRepository clientRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public void register(RegisterDtoRequest request){
-        if(supplierRepository.findByLogin(request.getLogin()).isPresent() || clientRepository.findByLogin(request.getLogin()).isPresent()) {
+    public UserInfoDtoResponse register(RegisterDtoRequest request) {
+        if (supplierRepository.findByLogin(request.getLogin()).isPresent()
+                || clientRepository.findByLogin(request.getLogin()).isPresent()) {
             throw new RuntimeException("Пользователь уже зарегистрирован");
         }
-        switch (request.getRole()){
-            case SUPPLIER:
+
+        switch (request.getRole()) {
+            case SUPPLIER -> {
                 Supplier supplier = new Supplier();
                 supplier.setLogin(request.getLogin());
                 supplier.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -34,30 +37,42 @@ public class AuthService {
                 supplier.setLoginTelegram(request.getLoginTelegram());
                 supplier.setChatId(request.getChatId());
                 supplier.setRole(request.getRole());
-                supplierRepository.save(supplier);
-                break;
 
-            case SOLE_TRADER:
+                Supplier saved = supplierRepository.save(supplier);
+
+                return new UserInfoDtoResponse(
+                        saved.getId(),
+                        saved.getLogin(),
+                        saved.getLoginTelegram(),
+                        saved.getChatId()
+                );
+            }
+
+            case SOLE_TRADER -> {
                 Client client = new Client();
-                client.setChatId(request.getChatId());
                 client.setLogin(request.getLogin());
                 client.setPassword(passwordEncoder.encode(request.getPassword()));
-                client.setLoginTelegram(request.getLoginTelegram());
-                client.setRole(request.getRole());
                 client.setActive(true);
-                log.info("ROLE: {}", client.getRole());
-                clientRepository.save(client);
-                break;
+                client.setLoginTelegram(request.getLoginTelegram());
+                client.setChatId(request.getChatId());
+                client.setRole(request.getRole());
 
-            default:
-                throw new IllegalArgumentException("Недопустимая роль: " + request.getRole());
+                Client saved = clientRepository.save(client);
+
+                return new UserInfoDtoResponse(
+                        saved.getId(),
+                        saved.getLogin(),
+                        saved.getLoginTelegram(),
+                        saved.getChatId()
+                );
+            }
+
+            default -> throw new IllegalArgumentException("Недопустимая роль: " + request.getRole());
         }
     }
 
-
-    public void login(LoginDtoRequest request){
+    public UserInfoDtoResponse login(LoginDtoRequest request){
         Optional<Supplier> supplierOptional = supplierRepository.findByLogin(request.getLogin());
-
         if (supplierOptional.isPresent()){
             Supplier supplier = supplierOptional.get();
 
@@ -66,6 +81,14 @@ public class AuthService {
             } else if (!supplier.isActive()) {
                 throw new RuntimeException("Пользователь заблокирован");
             }
+
+            return new UserInfoDtoResponse(
+                    supplier.getId(),
+                    supplier.getLogin(),
+                    supplier.getLoginTelegram(),
+                    supplier.getChatId()
+
+            );
 
         }
 
@@ -79,6 +102,16 @@ public class AuthService {
             if (!client.isActive()) {
                 throw new RuntimeException("Пользователь заблокирован");
             }
+
+            return new UserInfoDtoResponse(
+                    client.getId(),
+                    client.getLogin(),
+                    client.getLoginTelegram(),
+                    client.getChatId()
+
+            );
         }
+
+        throw new RuntimeException("Пользователь с таким логином не найден");
     }
 }
