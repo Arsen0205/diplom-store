@@ -48,7 +48,7 @@ public class ProductController {
         request.setSellingPrice(sellingPrice);
         request.setImages(images);
 
-        Product product = productService.createProduct(request, principal);
+        productService.createProduct(request, principal);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Объявление создано!");
     }

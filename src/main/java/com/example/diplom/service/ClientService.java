@@ -26,24 +26,16 @@ public class ClientService {
     private final CartRepository cartRepository;
 
 
-    public ResponseEntity<ClientsDtoResponse> clientInfo(Long id, Principal principal){
-        Client client = clientRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Пользователь не найден"));
-
+    public ResponseEntity<ClientsDtoResponse> clientInfo(Principal principal){
         Client currentUser = (Client) productService.getUserByPrincipal(principal);
 
-        if (!client.getId().equals(currentUser.getId())){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .build();
-        }
-
         ClientsDtoResponse clientsDtoResponse = new ClientsDtoResponse(
-                client.getId(),
-                client.getLogin(),
-                client.getLoginTelegram(),
-                client.getChatId(),
-                client.isActive(),
-                client.getRole()
+                currentUser.getId(),
+                currentUser.getLogin(),
+                currentUser.getLoginTelegram(),
+                currentUser.getChatId(),
+                currentUser.isActive(),
+                currentUser.getRole()
         );
 
         return ResponseEntity.ok(clientsDtoResponse);
