@@ -1,24 +1,21 @@
-# 1️⃣ Этап сборки
-FROM maven:latest AS build
+# Используем официальный образ JDK
+FROM eclipse-temurin:17-jdk-alpine
+
+# Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Копируем pom.xml и загружаем зависимости (кэширование)
-COPY pom.xml .
-RUN mvn dependency:resolve
+# Копируем build.gradle и pom.xml, если используешь Maven или Gradle
+COPY .mvn .mvn
+COPY mvnw pom.xml ./
 
-# Копируем весь проект и собираем его
-COPY . .
-RUN mvn clean package -DskipTests
+# Кэшируем зависимости
+RUN ./mvnw dependency:go-offline
 
-# 2️⃣ Этап выполнения
-FROM openjdk:17-jdk-slim
-WORKDIR /app
+# Копируем остальной проект
+COPY src ./src
 
-# Копируем собранный JAR из предыдущего этапа
-COPY --from=build /app/target/*.jar app.jar
-
-# Оптимизация запуска JVM
-ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
+# Собираем проект
+RUN ./mvnw clean package -DskipTests
 
 # Запускаем приложение
-CMD ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+CMD ["java", "-jar", "target/radio-station-0.0.1-SNAPSHOT.jar"]

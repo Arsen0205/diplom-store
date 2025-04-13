@@ -15,9 +15,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +27,8 @@ import java.util.stream.Collectors;
 public class PayService {
     private final OrderRepository orderRepository;
     private final ClientRepository clientRepository;
+    private final OrderCheckService orderCheckService;
+    private final TelegramNotificationService telegramNotificationService;
 
     @Transactional
     public ResponseEntity<byte[]> payForOrder(Long orderId, Principal principal) {
@@ -76,4 +80,5 @@ public class PayService {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }

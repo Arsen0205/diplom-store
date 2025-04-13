@@ -235,7 +235,7 @@ public class TelegramNotificationService {
         String url = "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage?chat_id=" + chatId + "&text=" + text;
         restTemplate.getForObject(url, String.class);
     }
-    //Логика сохранения чат-айди пользователя по логину телеграмма
+
 
     public void sendDocument(String chatId, File document, String caption) {
         String url = "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendDocument";
@@ -250,5 +250,6 @@ public class TelegramNotificationService {
 
         HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
         restTemplate.postForEntity(url, request, String.class);
+        System.out.println("Ответ от Telegram: " + request.getBody());
     }
 }
