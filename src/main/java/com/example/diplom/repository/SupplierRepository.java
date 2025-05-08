@@ -11,4 +11,5 @@ import java.util.Optional;
 @Repository
 public interface SupplierRepository extends JpaRepository<Supplier, Long> {
     Optional<Supplier> findByLogin(String login);
+    boolean existsByLogin(String login);
 }

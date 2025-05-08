@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
@@ -44,6 +45,30 @@ public class Client implements UserDetails {
     @Column(name = "chat_id", unique = true)
     private String chatId;
 
+    //Инн клиента
+    @Column(name="inn", unique = true)
+    private String inn;
+
+    //ОГРНИП клиента
+    @Column(name = "OGRNIP", unique = true)
+    private String ogrnip;
+
+    //Платежный счет клиента
+    @Column(name="payment_account", unique = true)
+    private String paymentAccount;
+
+    //Почтовый адрес клиента
+    @Column(name="email", unique = true)
+    private String email;
+
+    //Номер телефона клиента
+    @Column(name="phone_number", unique = true)
+    private String phoneNumber;
+
+    //ФИО клиента
+    @Column(name="fio")
+    private String fio;
+
     //Разрешен ли доступ или нет
     @Column(name="active")
     private boolean active;
@@ -60,7 +85,7 @@ public class Client implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     public boolean isSupplier(){return role.equals(Role.SUPPLIER);}
@@ -70,5 +95,25 @@ public class Client implements UserDetails {
     @Override
     public String getUsername() {
         return login;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return active;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return active;
     }
 }
