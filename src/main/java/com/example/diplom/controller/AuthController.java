@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
+@RequestMapping("/api/v1/auth")
 public class AuthController {
     private AuthService authService;
     private final AuthenticationManager authManager;
@@ -38,14 +39,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    //Авторизация пользователя
     @PostMapping("/login")
-    public ResponseEntity<UserInfoDtoResponse> loginUser(@Valid @RequestBody LoginDtoRequest request){
-        UserInfoDtoResponse response = authService.login(request);
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/api/auth/login")
     public ResponseEntity<?> login(@Valid @RequestBody AuthenticationRequest request) {
         try {
             var auth = authManager.authenticate(

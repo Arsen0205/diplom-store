@@ -13,21 +13,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.Map;
 
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/client")
+@RequestMapping("/api/v1/client")
 public class ClientController {
     private OrderService orderService;
     private ClientService clientService;
-
-
-    @GetMapping
-    public ResponseEntity<?> getCurrentsUser(Principal principal){
-        return ResponseEntity.ok(Map.of("user", principal != null ? principal.getName() : "Guest"));
-    }
 
     //Просмотр своего профиля
     @GetMapping("/me")

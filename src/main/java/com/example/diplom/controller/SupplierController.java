@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/supplier")
+@RequestMapping("/api/v1/supplier")
 public class SupplierController {
     private SupplierService supplierService;
 

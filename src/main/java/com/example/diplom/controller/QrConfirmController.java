@@ -21,7 +21,7 @@ public class QrConfirmController {
     private final OrderCheckService orderCheckService;
     private final TelegramNotificationService telegramNotificationService;
 
-    @GetMapping("/qr-confirm")
+    @GetMapping("/api/v1/qr-confirm")
     public ResponseEntity<String> confirmQr(@RequestParam Long orderId) throws Exception {
         Optional<Order> orderOpt = orderRepository.findById(orderId);
         if (orderOpt.isEmpty()) return ResponseEntity.badRequest().body("Order not found");

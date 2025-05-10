@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/user")
+@RequestMapping("/api/v1/user")
 public class UserController {
     private ClientRepository clientRepository;
     private SupplierRepository supplierRepository;

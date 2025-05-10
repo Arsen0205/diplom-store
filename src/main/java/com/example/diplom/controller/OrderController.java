@@ -13,12 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/order")
+@RequestMapping("/api/v1/order")
 public class OrderController {
     private OrderService orderService;
     private CartRepository cartRepository;
@@ -48,24 +46,6 @@ public class OrderController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("Заказ успешно оформлен");
-    }
-
-    //Информация о заказе
-    @GetMapping("/info/{id}")
-    public ResponseEntity<?> orderInfo(@PathVariable("id") Long id, Principal principal){
-        //Object currentUser = productService.getUserByPrincipal(principal);
-        Supplier supplier = supplierRepository.findByLogin(principal.getName()).orElseThrow(()-> new IllegalArgumentException("Пользователя не существует"));
-        Order order = orderRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("Такого заказа не существует"));
-
-        if (supplier.getId().equals(order.getSupplier().getId())) {
-            Map<String, Object> response = new HashMap<>();
-
-            response.put("order", order);
-            return ResponseEntity.ok(response);
-        }
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Ошибка просмотра заказа: вы не можете смотреть чужие заказы");
     }
 
     @PostMapping("/confirmed/{id}")
