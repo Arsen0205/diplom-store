@@ -73,6 +73,13 @@ public class SecurityConfig {
                 // Разрешаем анонимный доступ к публичным эндпоинтам
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/v3/api-docs",
+                                "/v3/api-docs.yaml"
+                        ).permitAll()
+                        .requestMatchers(
                                 "/api/v1/auth/**",
                                 "/api/v1/product",
                                 "/api/v1/product/**",
