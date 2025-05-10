@@ -15,7 +15,7 @@ import java.security.Principal;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/cart")
+@RequestMapping("/api/v1/cart")
 public class CartController {
     private CartService cartService;
     private CartItemRepository cartItemRepository;

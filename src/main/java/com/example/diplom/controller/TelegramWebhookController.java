@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/telegram")
+@RequestMapping("/api/v1/telegram")
 public class TelegramWebhookController {
     private final TelegramNotificationService telegramNotificationService;
     private final OrderCheckService orderCheckService;

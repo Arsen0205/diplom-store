@@ -73,20 +73,26 @@ public class SecurityConfig {
                 // Разрешаем анонимный доступ к публичным эндпоинтам
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/register",
-                                "/login",
-                                "/css/**",
-                                "/product/**",
-                                "/order/**",
-                                "/supplier/**",
-                                "/telegram/**",
-                                "/qr-confirm/**"
+                                "/api/v1/auth/**",
+                                "/api/v1/product",
+                                "/api/v1/product/**",
+                                "/api/v1/user/**",
+                                "/api/v1/telegram/**",
+                                "/api/v1/qr-confirm"
                         ).permitAll()
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        .requestMatchers(
+                                "/api/v1/client/**",
+                                "/api/v1/cart/**",
+                                "/api/v1/order/create",
+                                "/api/v1/order/pay/**",
+                                "/api/v1/order/checkout")
+                        .hasRole("SOLE_TRADER")
+                        .requestMatchers("/api/v1/supplier/**",
+                                "/api/v1/product/**",
+                                "/api/v1/order/**").hasRole("SUPPLIER")
                         .anyRequest().authenticated()
                 )
-
-                // Если вам нужен HTTP BASIC (не обязателен при JWT, можно удалить)
-                .httpBasic(Customizer.withDefaults())
 
                 // Stateless — без сессий
                 .sessionManagement(sess ->

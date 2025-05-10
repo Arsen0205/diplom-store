@@ -2,6 +2,7 @@ package com.example.diplom.controller;
 
 
 import com.example.diplom.dto.request.CreateProductDtoRequest;
+import com.example.diplom.dto.response.MainDtoResponse;
 import com.example.diplom.dto.response.ProductInfoMainDtoResponse;
 import com.example.diplom.models.Product;
 import com.example.diplom.repository.ProductRepository;
@@ -19,16 +20,16 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/product")
+@RequestMapping("/api/v1/product")
 public class ProductController {
     private ProductService productService;
     private ProductRepository productRepository;
 
     //Список всех продуктов
     @GetMapping
-    public ResponseEntity<List<Product>> product(Principal principal){
-        List<Product> products = productRepository.findAll();
-        return ResponseEntity.ok(products);
+    public ResponseEntity<List<MainDtoResponse>> product(Principal principal){
+        List<MainDtoResponse> responses = productService.getAllProduct();
+        return ResponseEntity.ok(responses);
     }
 
     //Создание продукта
