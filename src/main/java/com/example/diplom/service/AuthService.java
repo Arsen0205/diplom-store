@@ -1,7 +1,8 @@
 package com.example.diplom.service;
 
 import com.example.diplom.dto.request.LoginDtoRequest;
-import com.example.diplom.dto.request.RegisterDtoRequest;
+import com.example.diplom.dto.request.RegisterClientDtoRequest;
+import com.example.diplom.dto.request.RegisterSupplierDtoRequest;
 import com.example.diplom.dto.response.UserInfoDtoResponse;
 import com.example.diplom.models.Client;
 import com.example.diplom.models.Supplier;
@@ -22,61 +23,70 @@ public class AuthService {
     private final ClientRepository clientRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserInfoDtoResponse register(RegisterDtoRequest request) {
+    public UserInfoDtoResponse registerSupplier(RegisterSupplierDtoRequest request) {
         if (supplierRepository.findByLogin(request.getLogin()).isPresent()
                 || clientRepository.findByLogin(request.getLogin()).isPresent()) {
             throw new RuntimeException("Пользователь уже зарегистрирован");
         }
 
-        switch (request.getRole()) {
-            case SUPPLIER -> {
-                Supplier supplier = new Supplier();
-                supplier.setLogin(request.getLogin());
-                supplier.setPassword(passwordEncoder.encode(request.getPassword()));
-                supplier.setActive(true);
-                supplier.setLoginTelegram(request.getLoginTelegram());
-                supplier.setChatId(request.getChatId());
-                supplier.setRole(request.getRole());
+        Supplier supplier = new Supplier();
+        supplier.setLogin(request.getLogin());
+        supplier.setPassword(passwordEncoder.encode(request.getPassword()));
+        supplier.setActive(true);
+        supplier.setLoginTelegram(request.getLoginTelegram());
+        supplier.setChatId(request.getChatId());
+        supplier.setRole(request.getRole());
+        supplier.setEmail(request.getEmail());
+        supplier.setFio(request.getFio());
+        supplier.setPhoneNumber(request.getPhoneNumber());
 
-                Supplier saved = supplierRepository.save(supplier);
+        Supplier saved = supplierRepository.save(supplier);
 
-                return new UserInfoDtoResponse(
-                        saved.getId(),
-                        saved.getLogin(),
-                        saved.getLoginTelegram(),
-                        saved.getChatId()
-                );
-            }
+        return new UserInfoDtoResponse(
+                saved.getId(),
+                saved.getLogin(),
+                saved.getLoginTelegram(),
+                saved.getChatId()
+        );
 
-            case SOLE_TRADER -> {
-                Client client = new Client();
-                client.setLogin(request.getLogin());
-                client.setPassword(passwordEncoder.encode(request.getPassword()));
-                client.setActive(true);
-                client.setLoginTelegram(request.getLoginTelegram());
-                client.setChatId(request.getChatId());
-                client.setRole(request.getRole());
-
-                Client saved = clientRepository.save(client);
-
-                return new UserInfoDtoResponse(
-                        saved.getId(),
-                        saved.getLogin(),
-                        saved.getLoginTelegram(),
-                        saved.getChatId()
-                );
-            }
-
-            default -> throw new IllegalArgumentException("Недопустимая роль: " + request.getRole());
-        }
     }
 
-    public UserInfoDtoResponse login(LoginDtoRequest request){
+    public UserInfoDtoResponse registerClient(RegisterClientDtoRequest request) {
+        if (supplierRepository.findByLogin(request.getLogin()).isPresent()
+                || clientRepository.findByLogin(request.getLogin()).isPresent()) {
+            throw new RuntimeException("Пользователь c таким логином уже зарегистрирован");
+        }
+
+        Client client = new Client();
+        client.setLogin(request.getLogin());
+        client.setFio(request.getFio());
+        client.setInn(request.getInn());
+        client.setEmail(request.getEmail());
+        client.setLoginTelegram(request.getLoginTelegram());
+        client.setChatId(request.getChatId());
+        client.setActive(true);
+        client.setOgrnip(request.getOgrnip());
+        client.setPhoneNumber(request.getPhoneNumber());
+        client.setPassword(passwordEncoder.encode(request.getPassword()));
+        client.setRole(request.getRole());
+
+        Client saved = clientRepository.save(client);
+
+        return new UserInfoDtoResponse(
+                saved.getId(),
+                saved.getLogin(),
+                saved.getLoginTelegram(),
+                saved.getChatId()
+        );
+
+    }
+
+    public UserInfoDtoResponse login(LoginDtoRequest request) {
         Optional<Supplier> supplierOptional = supplierRepository.findByLogin(request.getLogin());
-        if (supplierOptional.isPresent()){
+        if (supplierOptional.isPresent()) {
             Supplier supplier = supplierOptional.get();
 
-            if(!passwordEncoder.matches(request.getPassword(), supplier.getPassword())){
+            if (!passwordEncoder.matches(request.getPassword(), supplier.getPassword())) {
                 throw new RuntimeException("Неверный пароль!");
             } else if (!supplier.isActive()) {
                 throw new RuntimeException("Пользователь заблокирован");
@@ -94,7 +104,7 @@ public class AuthService {
 
         Optional<Client> clientOptional = clientRepository.findByLogin(request.getLogin());
 
-        if(clientOptional.isPresent()) {
+        if (clientOptional.isPresent()) {
             Client client = clientOptional.get();
             if (!passwordEncoder.matches(request.getPassword(), client.getPassword())) {
                 throw new RuntimeException("Неверный пароль!");

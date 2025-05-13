@@ -53,10 +53,6 @@ public class Client implements UserDetails {
     @Column(name = "OGRNIP", unique = true)
     private String ogrnip;
 
-    //Платежный счет клиента
-    @Column(name="payment_account", unique = true)
-    private String paymentAccount;
-
     //Почтовый адрес клиента
     @Column(name="email", unique = true)
     private String email;

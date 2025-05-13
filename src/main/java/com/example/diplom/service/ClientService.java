@@ -21,7 +21,6 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 public class ClientService {
-    private final ClientRepository clientRepository;
     private final ProductService productService;
     private final CartRepository cartRepository;
 

@@ -3,7 +3,6 @@ package com.example.diplom.controller;
 import com.example.diplom.models.Order;
 import com.example.diplom.repository.OrderRepository;
 import com.example.diplom.service.OrderCheckService;
-import com.example.diplom.service.PayService;
 import com.example.diplom.service.TelegramNotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -71,18 +72,32 @@ public class ProductService {
         productRepository.save(product);
     }
 
-    public List<MainDtoResponse> getAllProduct(){
-        List<Product> products = productRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<MainDtoResponse> getAllProduct() {
+        return productRepository.findAll().stream()
+                .map(p -> {
+                    String url = p.getImages().stream()
+                            .filter(Image::isPreviewImage)
+                            .map(Image::getUrl)
+                            .findFirst()
+                            // 2) если нет, берём просто первую из списка
+                            .orElseGet(() -> p.getImages().stream()
+                                    .map(Image::getUrl)
+                                    .findFirst()
+                                    .orElse("/images/placeholder.png")
+                            );
 
-        return products.stream()
-                .map(product -> new MainDtoResponse(
-                        product.getId(),
-                        product.getTitle(),
-                        product.getPrice(),
-                        product.getQuantity()
-                ))
+                    return new MainDtoResponse(
+                            p.getId(),
+                            p.getTitle(),
+                            p.getPrice(),
+                            p.getQuantity(),
+                            url
+                    );
+                })
                 .toList();
     }
+
 
     public ProductInfoMainDtoResponse productInfo(Long id){
         Product product = productRepository.findById(id)

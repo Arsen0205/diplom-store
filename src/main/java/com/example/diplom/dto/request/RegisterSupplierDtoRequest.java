@@ -6,14 +6,22 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class RegisterDtoRequest {
+public class RegisterSupplierDtoRequest {
     @NotNull(message = "Данное поле не может быть пустым")
     private String login;
     @NotNull(message = "Данное поле не может быть пустым")
     @Size(min = 8, max = 50, message = "Имя должно быть длиной от 2 до 50 символов")
     private String password;
+    @NotNull(message = "Данное поле не может быть пустым")
     private String loginTelegram;
+    @NotNull(message = "Данное поле не может быть пустым")
     private String chatId;
+    @NotNull(message = "Данное поле не может быть пустым")
+    private String fio;
+    @NotNull(message = "Данное поле не может быть пустым")
+    private String email;
+    @NotNull(message = "Данное поле не может быть пустым")
+    private String phoneNumber;
     @NotNull(message = "Данное поле не может быть пустым")
     private Role role;
 }

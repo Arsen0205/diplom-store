@@ -7,8 +7,6 @@ import com.example.diplom.models.Product;
 import com.example.diplom.models.enums.OrderStatus;
 import com.example.diplom.repository.OrderRepository;
 import com.example.diplom.repository.ProductRepository;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
