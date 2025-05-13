@@ -2,13 +2,11 @@ package com.example.diplom.config;
 
 import com.example.diplom.component.JwtAuthenticationFilter;
 import com.example.diplom.service.CustomUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -64,25 +62,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // CORS-конфигурируем через Customizer
                 .cors(Customizer.withDefaults())
-
-                // Отключаем CSRF
                 .csrf(csrf -> csrf.disable())
 
-                // Разрешаем анонимный доступ к публичным эндпоинтам
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
                                 "/v3/api-docs",
-                                "/v3/api-docs.yaml"
-                        ).permitAll()
-                        .requestMatchers(
+                                "/v3/api-docs.yaml",
+
                                 "/api/v1/auth/**",
                                 "/api/v1/product",
-                                "/api/v1/product/**",
+                                "/api/v1/product/*",
                                 "/api/v1/user/**",
                                 "/api/v1/telegram/**",
                                 "/api/v1/qr-confirm"
@@ -93,20 +86,17 @@ public class SecurityConfig {
                                 "/api/v1/cart/**",
                                 "/api/v1/order/create",
                                 "/api/v1/order/pay/**",
-                                "/api/v1/order/checkout")
+                                "/api/v1/order/checkout",
+                                "/api/v1/order/cancelled/**")
                         .hasRole("SOLE_TRADER")
                         .requestMatchers("/api/v1/supplier/**",
                                 "/api/v1/product/**",
                                 "/api/v1/order/**").hasRole("SUPPLIER")
                         .anyRequest().authenticated()
                 )
-
-                // Stateless — без сессий
                 .sessionManagement(sess ->
                         sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
-                // Ваш JWT-фильтр
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -48,9 +48,6 @@ public class Supplier implements UserDetails {
     @Column(name="active")
     private boolean active;
 
-    @Column(name="description", columnDefinition = "TEXT")
-    private String description;
-
     @Column(name="fio")
     private String fio;
 
@@ -59,9 +56,6 @@ public class Supplier implements UserDetails {
 
     @Column(name="phone_number")
     private String phoneNumber;
-
-
-
 
     @Enumerated(EnumType.STRING)
     private Role role;

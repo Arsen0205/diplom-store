@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/client")
-public class ClientController {
+public class SoleTraderController {
     private OrderService orderService;
     private ClientService clientService;
 
@@ -34,7 +34,7 @@ public class ClientController {
         return clientService.getCart(principal);
     }
 
-    //Просмотр и отслеживание заказов пользователя
+    //Просмотр и отслеживание своих заказов
     @GetMapping("/my/orders")
     public ResponseEntity<List<OrderClientDtoResponse>> getClientOrders(Principal principal){
         List<OrderClientDtoResponse> responses = orderService.getOrdersByClient(principal);
