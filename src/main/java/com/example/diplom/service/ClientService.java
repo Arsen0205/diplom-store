@@ -34,6 +34,11 @@ public class ClientService {
                 currentUser.getLoginTelegram(),
                 currentUser.getChatId(),
                 currentUser.isActive(),
+                currentUser.getInn(),
+                currentUser.getOgrnip(),
+                currentUser.getEmail(),
+                currentUser.getPhoneNumber(),
+                currentUser.getFio(),
                 currentUser.getRole()
         );
 

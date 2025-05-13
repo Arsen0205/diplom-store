@@ -39,6 +39,9 @@ public class SupplierService {
                 currentUser.getLoginTelegram(),
                 currentUser.getChatId(),
                 currentUser.isActive(),
+                currentUser.getPhoneNumber(),
+                currentUser.getFio(),
+                currentUser.getEmail(),
                 currentUser.getRole()
         );
         return ResponseEntity.ok(suppliersDtoResponse);

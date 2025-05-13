@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/client")
-public class SoleTraderController {
+public class ClientController {
     private OrderService orderService;
     private ClientService clientService;
 

@@ -12,5 +12,8 @@ public class SuppliersDtoResponse {
     private String loginTelegram;
     private String chatId;
     private boolean active;
+    private String phoneNumber;
+    private String fio;
+    private String email;
     private Role role;
 }

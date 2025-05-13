@@ -36,6 +36,11 @@ public class AdminService {
                         client.getLoginTelegram(),
                         client.getChatId(),
                         client.isActive(),
+                        client.getInn(),
+                        client.getOgrnip(),
+                        client.getEmail(),
+                        client.getPhoneNumber(),
+                        client.getFio(),
                         client.getRole()
                 ))
                 .toList();
@@ -51,6 +56,9 @@ public class AdminService {
                         supplier.getLoginTelegram(),
                         supplier.getChatId(),
                         supplier.isActive(),
+                        supplier.getPhoneNumber(),
+                        supplier.getFio(),
+                        supplier.getEmail(),
                         supplier.getRole()
                 ))
                 .toList();

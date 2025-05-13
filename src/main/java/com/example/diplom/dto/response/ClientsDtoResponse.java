@@ -12,5 +12,10 @@ public class ClientsDtoResponse {
     private String loginTelegram;
     private String chatId;
     private boolean active;
+    private String inn;
+    private String ogrnip;
+    private String email;
+    private String phoneNumber;
+    private String fio;
     private Role role;
 }
