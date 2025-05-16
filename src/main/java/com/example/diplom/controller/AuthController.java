@@ -3,8 +3,10 @@ package com.example.diplom.controller;
 
 import com.example.diplom.component.JwtUtil;
 import com.example.diplom.dto.request.AuthenticationRequest;
+import com.example.diplom.dto.request.RegisterAdminDtoRequest;
 import com.example.diplom.dto.request.RegisterClientDtoRequest;
 import com.example.diplom.dto.request.RegisterSupplierDtoRequest;
+import com.example.diplom.dto.response.AdminInfoDtoResponse;
 import com.example.diplom.dto.response.AuthenticationResponse;
 import com.example.diplom.dto.response.UserInfoDtoResponse;
 import com.example.diplom.repository.ClientRepository;
@@ -28,9 +30,7 @@ public class AuthController {
     private AuthService authService;
     private final AuthenticationManager authManager;
     private final JwtUtil jwtUtil;
-    private final ClientRepository clientRepo;
-    private final SupplierRepository supplierRepo;
-    private final PasswordEncoder encoder;
+
 
     //Регистрация нового поставщика
     @PostMapping("/register/supplier")
@@ -42,6 +42,12 @@ public class AuthController {
     @PostMapping("/register/client")
     public ResponseEntity<UserInfoDtoResponse> registerClient(@Valid @RequestBody RegisterClientDtoRequest request){
         UserInfoDtoResponse response = authService.registerClient(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/register/admin")
+    public ResponseEntity<AdminInfoDtoResponse> registerAdmin(@Valid @RequestBody RegisterAdminDtoRequest request){
+        AdminInfoDtoResponse response = authService.registerAdmin(request);
         return ResponseEntity.ok(response);
     }
 

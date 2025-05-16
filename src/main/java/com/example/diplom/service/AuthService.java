@@ -1,11 +1,15 @@
 package com.example.diplom.service;
 
 import com.example.diplom.dto.request.LoginDtoRequest;
+import com.example.diplom.dto.request.RegisterAdminDtoRequest;
 import com.example.diplom.dto.request.RegisterClientDtoRequest;
 import com.example.diplom.dto.request.RegisterSupplierDtoRequest;
+import com.example.diplom.dto.response.AdminInfoDtoResponse;
 import com.example.diplom.dto.response.UserInfoDtoResponse;
+import com.example.diplom.models.Admin;
 import com.example.diplom.models.Client;
 import com.example.diplom.models.Supplier;
+import com.example.diplom.repository.AdminRepository;
 import com.example.diplom.repository.ClientRepository;
 import com.example.diplom.repository.SupplierRepository;
 import lombok.AllArgsConstructor;
@@ -21,11 +25,12 @@ import java.util.Optional;
 public class AuthService {
     private final SupplierRepository supplierRepository;
     private final ClientRepository clientRepository;
+    private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
 
     public UserInfoDtoResponse registerSupplier(RegisterSupplierDtoRequest request) {
         if (supplierRepository.findByLogin(request.getLogin()).isPresent()
-                || clientRepository.findByLogin(request.getLogin()).isPresent()) {
+                || clientRepository.findByLogin(request.getLogin()).isPresent() || adminRepository.findByLogin(request.getLogin()).isPresent()) {
             throw new RuntimeException("Пользователь уже зарегистрирован");
         }
 
@@ -53,7 +58,7 @@ public class AuthService {
 
     public UserInfoDtoResponse registerClient(RegisterClientDtoRequest request) {
         if (supplierRepository.findByLogin(request.getLogin()).isPresent()
-                || clientRepository.findByLogin(request.getLogin()).isPresent()) {
+                || clientRepository.findByLogin(request.getLogin()).isPresent() || adminRepository.findByLogin(request.getLogin()).isPresent()) {
             throw new RuntimeException("Пользователь c таким логином уже зарегистрирован");
         }
 
@@ -78,6 +83,29 @@ public class AuthService {
                 saved.getLoginTelegram(),
                 saved.getChatId()
         );
+
+    }
+
+    public AdminInfoDtoResponse registerAdmin(RegisterAdminDtoRequest request){
+        if (supplierRepository.findByLogin(request.getLogin()).isPresent()
+                || clientRepository.findByLogin(request.getLogin()).isPresent() || adminRepository.findByLogin(request.getLogin()).isPresent()) {
+            throw new RuntimeException("Пользователь c таким логином уже зарегистрирован");
+        }
+
+        Admin admin = new Admin();
+        admin.setRole(request.getRole());
+        admin.setLogin(request.getLogin());
+        admin.setActive(true);
+        admin.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        Admin saved = adminRepository.save(admin);
+
+        return new AdminInfoDtoResponse(
+                saved.getId(),
+                saved.getLogin(),
+                saved.getPassword(),
+                saved.getRole()
+                );
 
     }
 
