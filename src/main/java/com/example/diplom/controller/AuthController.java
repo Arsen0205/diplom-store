@@ -7,11 +7,10 @@ import com.example.diplom.dto.request.RegisterAdminDtoRequest;
 import com.example.diplom.dto.request.RegisterClientDtoRequest;
 import com.example.diplom.dto.request.RegisterSupplierDtoRequest;
 import com.example.diplom.dto.response.AdminInfoDtoResponse;
-import com.example.diplom.dto.response.AuthenticationResponse;
+import com.example.diplom.dto.response.LoginResponse;
 import com.example.diplom.dto.response.UserInfoDtoResponse;
-import com.example.diplom.repository.ClientRepository;
-import com.example.diplom.repository.SupplierRepository;
 import com.example.diplom.service.AuthService;
+import com.example.diplom.service.UserInfoService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,8 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -30,6 +29,7 @@ public class AuthController {
     private AuthService authService;
     private final AuthenticationManager authManager;
     private final JwtUtil jwtUtil;
+    private final UserInfoService userInfoService;
 
 
     //Регистрация нового поставщика
@@ -52,20 +52,26 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody AuthenticationRequest request) {
+    public ResponseEntity<LoginResponse> login(
+            @Valid @RequestBody AuthenticationRequest request) {
         try {
-            var auth = authManager.authenticate(
+            Authentication auth = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.login(), request.password()
+                            request.getLogin(), request.getPassword()
                     )
             );
-            UserDetails ud = (UserDetails) auth.getPrincipal();
-            String token = jwtUtil.generateToken(ud);
-            return ResponseEntity.ok(new AuthenticationResponse(token));
+            // 1) Генерируем JWT
+            String token = jwtUtil.generateToken((UserDetails) auth.getPrincipal());
+
+            // 2) Получаем DTO с данными пользователя
+            UserInfoDtoResponse userDto = userInfoService.getByLogin(request.getLogin());
+
+            // 3) Возвращаем вместе
+            return ResponseEntity.ok(new LoginResponse(token, userDto));
         } catch (BadCredentialsException ex) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body("Неверные учётные данные");
+                    .body(null);
         }
     }
 }

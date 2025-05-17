@@ -92,7 +92,8 @@ public class ProductService {
                             p.getTitle(),
                             p.getPrice(),
                             p.getQuantity(),
-                            url
+                            url,
+                            p.getSupplier().getLogin()
                     );
                 })
                 .toList();

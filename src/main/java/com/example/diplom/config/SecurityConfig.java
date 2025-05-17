@@ -77,6 +77,7 @@ public class SecurityConfig {
                                 "/api/v1/auth/login",
                                 "/api/v1/auth/register/client",
                                 "/api/v1/auth/register/supplier",
+                                "/api/v1/auth/register/admin",
                                 "/api/v1/product",
                                 "/api/v1/product/*",
                                 "/api/v1/user/**",
@@ -84,8 +85,7 @@ public class SecurityConfig {
                                 "/api/v1/qr-confirm"
                         ).permitAll()
                         .requestMatchers(
-                                "/api/v1/admin/**",
-                                "/api/v1/auth/register/admin").hasRole("ADMIN")
+                                "/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers(
                                 "/api/v1/client/**",
                                 "/api/v1/cart/**",

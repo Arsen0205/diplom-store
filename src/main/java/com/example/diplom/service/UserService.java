@@ -23,13 +23,20 @@ public class UserService {
         Optional<Supplier> supplierOptional = supplierRepository.findById(id);
 
         if (clientOptional.isPresent()){
-            Client client = clientOptional.get();
+            Client s = clientOptional.get();
 
             return new UserInfoDtoResponse(
-                    client.getId(),
-                    client.getLogin(),
-                    client.getLoginTelegram(),
-                    client.getChatId()
+                    s.getId(),
+                    s.getLogin(),
+                    s.getLoginTelegram(),
+                    s.getInn(),
+                    s.getChatId(),
+                    s.getOgrnip(),
+                    s.getEmail(),
+                    s.getPhoneNumber(),
+                    s.getFio(),
+                    s.getPassword(),
+                    s.getRole()
             );
         } else if (supplierOptional.isPresent()) {
             Supplier supplier = supplierOptional.get();
@@ -38,7 +45,14 @@ public class UserService {
                     supplier.getId(),
                     supplier.getLogin(),
                     supplier.getLoginTelegram(),
-                    supplier.getChatId()
+                    null,
+                    supplier.getChatId(),
+                    null,
+                    supplier.getEmail(),
+                    supplier.getPhoneNumber(),
+                    supplier.getFio(),
+                    supplier.getPassword(),
+                    supplier.getRole()
             );
         }
 
