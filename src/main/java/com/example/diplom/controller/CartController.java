@@ -2,8 +2,9 @@ package com.example.diplom.controller;
 
 import com.example.diplom.dto.request.AddCartDtoRequest;
 import com.example.diplom.dto.request.DeleteCartItemDtoRequest;
-import com.example.diplom.repository.CartItemRepository;
 import com.example.diplom.service.CartService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,35 +13,50 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
-
+@Tag(name = "Cart", description = "Операции с корзиной пользователя")
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/cart")
 public class CartController {
-    private CartService cartService;
-    private CartItemRepository cartItemRepository;
+    private final CartService cartService;
 
-    //Добавление товара в заказ
+    @Operation(
+            summary     = "Добавить товар в корзину",
+            description = "Добавляет указанный товар и количество в корзину текущего пользователя"
+    )
     @PostMapping("/add")
-    public ResponseEntity<String> addCart(@Valid @RequestBody AddCartDtoRequest request, Principal principal){
+    public ResponseEntity<String> addCart(
+            @Valid @RequestBody AddCartDtoRequest request,
+            Principal principal
+    ) {
         cartService.addCart(request, principal);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("Товар добавлен");
     }
 
-    //Удаление определенного товара в корзине
+    @Operation(
+            summary     = "Удалить товар из корзины",
+            description = "Удаляет весь указанный элемент корзины текущего пользователя по его ID"
+    )
     @GetMapping("/remove/{itemId}")
-    public ResponseEntity<String> cartRemove(@PathVariable("itemId") Long id, Principal principal){
+    public ResponseEntity<String> cartRemove(
+            @PathVariable("itemId") Long id,
+            Principal principal
+    ) {
         cartService.cartRemove(id, principal);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body("Вы удалили товар из корзины");
+        return ResponseEntity.ok("Вы удалили товар из корзины");
     }
 
-    //Удаление определенного кол-ва товара в корзине
+    @Operation(
+            summary     = "Уменьшить количество товара в корзине",
+            description = "Уменьшает количество указанного элемента корзины текущего пользователя"
+    )
     @PostMapping("/decrease")
-    public ResponseEntity<String> decreaseItemQuantity(@RequestBody DeleteCartItemDtoRequest request, Principal principal) {
+    public ResponseEntity<String> decreaseItemQuantity(
+            @Valid @RequestBody DeleteCartItemDtoRequest request,
+            Principal principal
+    ) {
         cartService.cartRemoveQuantity(request, principal);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body("Продукт удален в количестве: " + request.getQuantity());
+        return ResponseEntity.ok("Продукт удален в количестве: " + request.getQuantity());
     }
 }
