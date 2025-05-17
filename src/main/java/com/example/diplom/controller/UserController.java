@@ -1,28 +1,32 @@
 package com.example.diplom.controller;
 
 import com.example.diplom.dto.response.UserInfoDtoResponse;
-import com.example.diplom.repository.ClientRepository;
-import com.example.diplom.repository.SupplierRepository;
 import com.example.diplom.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
-
+@Tag(name = "User", description = "Просмотр профиля других пользователей")
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/user")
 public class UserController {
-    private ClientRepository clientRepository;
-    private SupplierRepository supplierRepository;
-    private UserService  userService;
+    private final UserService userService;
 
-    //Просмотр профиля пользователя
+    @Operation(
+            summary     = "Просмотр профиля пользователя",
+            description = "Возвращает информацию о пользователе по его уникальному ID"
+    )
     @GetMapping("/{id}")
-    public UserInfoDtoResponse userInfo(@PathVariable("id") Long id){
+    public UserInfoDtoResponse userInfo(
+            @Parameter(description = "ID пользователя", required = true, example = "1")
+            @PathVariable("id") Long id
+    ) {
         return userService.userInfo(id);
     }
 }
