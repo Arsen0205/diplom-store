@@ -4,6 +4,7 @@ package com.example.diplom.service;
 import com.example.diplom.dto.request.CreateProductDtoRequest;
 import com.example.diplom.dto.response.MainDtoResponse;
 import com.example.diplom.dto.response.ProductInfoMainDtoResponse;
+import com.example.diplom.dto.response.SuppliersDtoResponse;
 import com.example.diplom.models.Client;
 import com.example.diplom.models.Image;
 import com.example.diplom.models.Product;
@@ -76,24 +77,39 @@ public class ProductService {
     public List<MainDtoResponse> getAllProduct() {
         return productRepository.findAll().stream()
                 .map(p -> {
+                    // 1) Находим картинку-превью или первую, иначе placeholder
                     String url = p.getImages().stream()
                             .filter(Image::isPreviewImage)
                             .map(Image::getUrl)
                             .findFirst()
-                            // 2) если нет, берём просто первую из списка
                             .orElseGet(() -> p.getImages().stream()
                                     .map(Image::getUrl)
                                     .findFirst()
                                     .orElse("/images/placeholder.png")
                             );
 
+                    // 2) Достаём сущность поставщика и строим DTO
+                    var sup = p.getSupplier();
+                    var supplierDto = new SuppliersDtoResponse(
+                            sup.getId(),
+                            sup.getLogin(),
+                            sup.getFio(),
+                            sup.getEmail(),
+                            sup.getPhoneNumber(),
+                            sup.getLoginTelegram(),
+                            sup.getChatId(),
+                            sup.isActive(),
+                            sup.getRole()
+                    );
+
+                    // 3) Собираем итоговый DTO продукта
                     return new MainDtoResponse(
                             p.getId(),
                             p.getTitle(),
                             p.getPrice(),
                             p.getQuantity(),
                             url,
-                            p.getSupplier().getLogin()
+                            supplierDto
                     );
                 })
                 .toList();
