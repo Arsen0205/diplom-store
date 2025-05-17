@@ -1,5 +1,5 @@
 # Используем официальный образ JDK
-FROM eclipse-temurin:17-jdk-alpine
+FROM eclipse-temurin:17-jdk
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
@@ -9,7 +9,7 @@ COPY .mvn .mvn
 COPY mvnw pom.xml ./
 
 # Кэшируем зависимости
-RUN ./mvnw dependency:go-offline
+RUN chmod +x ./mvnw && ./mvnw dependency:go-offline
 
 # Копируем остальной проект
 COPY src ./src
