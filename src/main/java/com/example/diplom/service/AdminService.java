@@ -48,6 +48,9 @@ public class AdminService {
                 .map(supplier -> new SuppliersDtoResponse(
                         supplier.getId(),
                         supplier.getLogin(),
+                        supplier.getFio(),
+                        supplier.getEmail(),
+                        supplier.getPhoneNumber(),
                         supplier.getLoginTelegram(),
                         supplier.getChatId(),
                         supplier.isActive(),

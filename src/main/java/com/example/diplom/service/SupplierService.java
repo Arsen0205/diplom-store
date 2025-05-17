@@ -36,6 +36,9 @@ public class SupplierService {
         SuppliersDtoResponse suppliersDtoResponse = new SuppliersDtoResponse(
                 currentUser.getId(),
                 currentUser.getLogin(),
+                currentUser.getFio(),
+                currentUser.getEmail(),
+                currentUser.getPhoneNumber(),
                 currentUser.getLoginTelegram(),
                 currentUser.getChatId(),
                 currentUser.isActive(),
