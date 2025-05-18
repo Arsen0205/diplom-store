@@ -107,6 +107,7 @@ public class ProductService {
                             p.getId(),
                             p.getTitle(),
                             p.getPrice(),
+                            p.getSellingPrice(),
                             p.getQuantity(),
                             url,
                             supplierDto
