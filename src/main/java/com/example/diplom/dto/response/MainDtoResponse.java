@@ -12,6 +12,7 @@ public class MainDtoResponse {
     private Long id;
     private String title;
     private BigDecimal price;
+    private BigDecimal sellingPrice;
     private int quantity;
     private String imageUrl;
     private SuppliersDtoResponse supplier;
