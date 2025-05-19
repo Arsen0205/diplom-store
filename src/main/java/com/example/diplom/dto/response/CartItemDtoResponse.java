@@ -10,8 +10,10 @@ import java.math.BigDecimal;
 public class CartItemDtoResponse {
     private Long id;
     private Long productId;
+    private String supplierLogin;
     private String title;
     private int quantity;
+    private String imageUrl;
     private BigDecimal price;
     private BigDecimal total;
 }

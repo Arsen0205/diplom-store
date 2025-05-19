@@ -6,6 +6,7 @@ import com.example.diplom.dto.response.CartItemDtoResponse;
 import com.example.diplom.dto.response.ClientsDtoResponse;
 import com.example.diplom.models.Cart;
 import com.example.diplom.models.Client;
+import com.example.diplom.models.Image;
 import com.example.diplom.models.Product;
 import com.example.diplom.repository.*;
 import lombok.AllArgsConstructor;
@@ -54,12 +55,25 @@ public class ClientService {
 
         List<CartItemDtoResponse> items = cart.getItems().stream().map(cartItem -> {
             Product product = cartItem.getProduct();
+
+            String imageUrl = product.getImages().stream()
+                    .filter(Image::isPreviewImage)
+                    .map(Image::getUrl)
+                    .findFirst()
+                    .orElseGet(() -> product.getImages().stream()
+                            .map(Image::getUrl)
+                            .findFirst()
+                            .orElse("/images/placeholder.png")
+                    );
+
             BigDecimal total = product.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()));
             return new CartItemDtoResponse(
                     cartItem.getId(),
                     product.getId(),
+                    product.getSupplier().getLogin(),
                     product.getTitle(),
                     cartItem.getQuantity(),
+                    imageUrl,
                     product.getPrice(),
                     total
             );
