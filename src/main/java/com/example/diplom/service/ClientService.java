@@ -56,6 +56,7 @@ public class ClientService {
             Product product = cartItem.getProduct();
             BigDecimal total = product.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()));
             return new CartItemDtoResponse(
+                    cartItem.getId(),
                     product.getId(),
                     product.getTitle(),
                     cartItem.getQuantity(),

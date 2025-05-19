@@ -34,6 +34,7 @@ public class CartController {
                 .body("Товар добавлен");
     }
 
+
     @Operation(
             summary     = "Удалить товар из корзины",
             description = "Удаляет весь указанный элемент корзины текущего пользователя по его ID"
@@ -57,6 +58,15 @@ public class CartController {
             Principal principal
     ) {
         cartService.cartRemoveQuantity(request, principal);
+        return ResponseEntity.ok("Продукт удален в количестве: " + request.getQuantity());
+    }
+
+    @PostMapping("/increase")
+    public ResponseEntity<String> increaseItemQuantity(
+            @Valid @RequestBody DeleteCartItemDtoRequest request,
+            Principal principal
+    ) {
+        cartService.increaseItemQuantity(request, principal);
         return ResponseEntity.ok("Продукт удален в количестве: " + request.getQuantity());
     }
 }

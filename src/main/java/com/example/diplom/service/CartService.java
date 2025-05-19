@@ -105,6 +105,33 @@ public class CartService {
         }
     }
 
+    public void increaseItemQuantity(DeleteCartItemDtoRequest request, Principal principal) {
+        Optional<CartItem> cartItemOpt = cartItemRepository.findById(request.getId());
+        Client client = clientRepository.findById(getUserByPrincipal(principal).getId())
+                .orElseThrow(() -> new IllegalArgumentException("Пользователя не существует"));
+        Cart cart = cartRepository.findByClientId(client.getId()).orElseThrow();
+
+        if (cartItemOpt.isPresent()) {
+            CartItem cartItem = cartItemOpt.get();
+
+            // Проверка: элемент принадлежит текущему пользователю
+            if (cartItem.getCart().getClient().getLogin().equals(principal.getName())) {
+
+                // Разрешаем увеличение, если запрошенное количество больше 0
+                if (request.getQuantity() > 0) {
+                    cartItem.setQuantity(cartItem.getQuantity() + request.getQuantity());
+                    cartItemRepository.save(cartItem);
+
+                    calculatePrice(request.getId());
+                    updateCartTotalPrice(cart);
+                } else {
+                    throw new IllegalArgumentException("Количество должно быть больше 0");
+                }
+            }
+        }
+    }
+
+
     public Client getUserByPrincipal(Principal principal) {
         if (principal == null) {
             return null;
