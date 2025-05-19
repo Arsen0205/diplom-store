@@ -52,7 +52,7 @@ public class CartController {
             summary     = "Уменьшить количество товара в корзине",
             description = "Уменьшает количество указанного элемента корзины текущего пользователя"
     )
-    @PostMapping("/decrease")
+    @DeleteMapping("/decrease")
     public ResponseEntity<String> decreaseItemQuantity(
             @Valid @RequestBody DeleteCartItemDtoRequest request,
             Principal principal
