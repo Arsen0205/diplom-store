@@ -117,20 +117,47 @@ public class ProductService {
     }
 
 
-    public ProductInfoMainDtoResponse productInfo(Long id){
+    @Transactional(readOnly = true)
+    public ProductInfoMainDtoResponse productInfo(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Товар не найден"));
+                .orElseThrow(() -> new RuntimeException("Товар не найден"));
 
-        ProductInfoMainDtoResponse response = new ProductInfoMainDtoResponse(
+        // 1. Логика выбора URL картинки
+        String url = product.getImages().stream()
+                .filter(Image::isPreviewImage)
+                .map(Image::getUrl)
+                .findFirst()
+                .orElseGet(() -> product.getImages().stream()
+                        .map(Image::getUrl)
+                        .findFirst()
+                        .orElse("/images/placeholder.png")
+                );
+
+        // 2. Собираем DTO поставщика
+        var sup = product.getSupplier();
+        SuppliersDtoResponse supplierDto = new SuppliersDtoResponse(
+                sup.getId(),
+                sup.getLogin(),
+                sup.getFio(),
+                sup.getEmail(),
+                sup.getPhoneNumber(),
+                sup.getLoginTelegram(),
+                sup.getChatId(),
+                sup.isActive(),
+                sup.getRole()
+        );
+
+        // 3. Собираем итоговый DTO продукта
+        return new ProductInfoMainDtoResponse(
                 product.getId(),
                 product.getTitle(),
                 product.getPrice(),
                 product.getQuantity(),
-                product.getSupplier().getLogin()
+                url,
+                supplierDto
         );
-
-        return response;
     }
+
 
     public ResponseEntity<String> deleteProduct(Long id, Principal principal){
         Product product = productRepository.findById(id).orElseThrow(()->new RuntimeException("Продукта нет"));

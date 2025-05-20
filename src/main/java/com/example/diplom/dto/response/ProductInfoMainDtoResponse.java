@@ -13,5 +13,6 @@ public class ProductInfoMainDtoResponse {
     private String title;
     private BigDecimal price;
     private int quantity;
-    private String supplierLogin;
+    private String imageUrl;
+    private SuppliersDtoResponse supplier;
 }
