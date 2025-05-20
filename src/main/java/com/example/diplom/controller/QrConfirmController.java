@@ -30,7 +30,7 @@ public class QrConfirmController {
             summary     = "Подтвердить заказ по QR",
             description = "Генерирует PDF-чек по заказу и отправляет его клиенту в Telegram"
     )
-    @GetMapping("/api/v1/qr-confirm")
+    @GetMapping("/qr-confirm")
     public ResponseEntity<String> confirmQr(@RequestParam Long orderId) throws Exception {
         Optional<Order> orderOpt = orderRepository.findById(orderId);
         if (orderOpt.isEmpty()) {

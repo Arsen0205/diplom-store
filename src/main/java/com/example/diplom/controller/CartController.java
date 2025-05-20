@@ -39,7 +39,8 @@ public class CartController {
             summary     = "Удалить товар из корзины",
             description = "Удаляет весь указанный элемент корзины текущего пользователя по его ID"
     )
-    @GetMapping("/remove/{itemId}")
+
+    @DeleteMapping("/remove/{itemId}")
     public ResponseEntity<String> cartRemove(
             @PathVariable("itemId") Long id,
             Principal principal
@@ -47,6 +48,7 @@ public class CartController {
         cartService.cartRemove(id, principal);
         return ResponseEntity.ok("Вы удалили товар из корзины");
     }
+
 
     @Operation(
             summary     = "Уменьшить количество товара в корзине",

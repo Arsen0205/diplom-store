@@ -26,7 +26,7 @@ import java.io.File;
 public class OrderCheckService {
 
     public File generateOrderReceiptPdf(Order order) throws Exception {
-        String paymentLink = "https://swift-walls-grab.loca.lt/qr-confirm?orderId=" + order.getId(); // можно заменить на свой
+        String paymentLink = "https://metal-emus-fry.loca.lt/qr-confirm?orderId=" + order.getId(); // можно заменить на свой
 
         File file = File.createTempFile("receipt_order_" + order.getId(), ".pdf");
         PdfWriter writer = new PdfWriter(file);
