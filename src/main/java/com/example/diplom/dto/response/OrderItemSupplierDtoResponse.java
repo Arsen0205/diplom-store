@@ -17,4 +17,5 @@ public class OrderItemSupplierDtoResponse {
     private BigDecimal totalCost;
     private BigDecimal costPrice;
     private BigDecimal profit;
+    private String imageUrl;
 }

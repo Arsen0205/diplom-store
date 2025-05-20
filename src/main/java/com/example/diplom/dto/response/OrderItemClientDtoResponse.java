@@ -13,4 +13,5 @@ public class OrderItemClientDtoResponse {
     private BigDecimal sellingPrice;
     private Long productSku;
     private BigDecimal totalPrice;
+    private String imageUrl;
 }

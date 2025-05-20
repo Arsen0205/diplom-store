@@ -84,7 +84,7 @@ public class SecurityConfig {
                                 "/api/v1/product/*",
                                 "/api/v1/user/**",
                                 "/api/v1/telegram/**",
-                                "/api/v1/qr-confirm"
+                                "/qr-confirm/**"
                         ).permitAll()
                         .requestMatchers(
                                 "/api/v1/admin/**").hasRole("ADMIN")

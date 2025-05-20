@@ -64,7 +64,7 @@ public class AuthController {
                     schema    = @Schema(implementation = UserInfoDtoResponse.class)
             )
     )
-    @PostMapping("/register/client")
+    @PostMapping("/register/sole_trader")
     public ResponseEntity<UserInfoDtoResponse> registerClient(
             @Valid @RequestBody RegisterClientDtoRequest request
     ) {

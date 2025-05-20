@@ -31,7 +31,7 @@ public class OrderCheckService {
     private final StripeService stripeService;
 
     public File generateOrderReceiptPdf(Order order) throws Exception {
-        String paymentLink = "https://fruity-bags-punch.loca.lt" + order.getId(); // можно заменить на свой
+        String paymentLink = "https://fruity-bags-punch.loca.lt/gr-confirm?orderId=" + order.getId(); // можно заменить на свой
 //        String paymentLink = stripeService.createCheckoutSession(
 //                order.getId(),        order.getTotalPrice().multiply(BigDecimal.valueOf(100)).longValue()
 //        );

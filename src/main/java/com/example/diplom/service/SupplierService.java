@@ -4,10 +4,7 @@ import com.example.diplom.dto.response.OrderItemSupplierDtoResponse;
 import com.example.diplom.dto.response.OrderSupplierDtoResponse;
 import com.example.diplom.dto.response.ProductDtoResponse;
 import com.example.diplom.dto.response.SuppliersDtoResponse;
-import com.example.diplom.models.Order;
-import com.example.diplom.models.OrderItem;
-import com.example.diplom.models.Product;
-import com.example.diplom.models.Supplier;
+import com.example.diplom.models.*;
 import com.example.diplom.repository.OrderItemRepository;
 import com.example.diplom.repository.OrderRepository;
 import com.example.diplom.repository.ProductRepository;
@@ -19,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -48,20 +46,35 @@ public class SupplierService {
     }
 
     @Transactional
-    public List<ProductDtoResponse> getProductSupplier(Principal principal){
+    public List<ProductDtoResponse> getProductSupplier(Principal principal) {
         Supplier supplier = getUserByPrincipal(principal);
 
         List<Product> products = productRepository.findBySupplier(supplier);
 
         return products.stream()
-                .map(product -> new ProductDtoResponse(
-                        product.getId(),
-                        product.getTitle(),
-                        product.getQuantity(),
-                        product.getPrice(),
-                        product.getSellingPrice()
-                ))
-                .toList();
+                .map(product -> {
+                    // 1) Находим картинку-превью или первую, иначе placeholder
+                    String url = product.getImages().stream()
+                            .filter(Image::isPreviewImage)
+                            .map(Image::getUrl)
+                            .findFirst()
+                            .orElseGet(() -> product.getImages().stream()
+                                    .map(Image::getUrl)
+                                    .findFirst()
+                                    .orElse("/images/placeholder.png")
+                            );
+
+                    // 2) Строим DTO продукта, передавая url
+                    return new ProductDtoResponse(
+                            product.getId(),
+                            product.getTitle(),
+                            product.getQuantity(),
+                            product.getPrice(),
+                            product.getSellingPrice(),
+                            url
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -89,27 +102,42 @@ public class SupplierService {
         Supplier supplier = getUserByPrincipal(principal);
 
         Order order = orderRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Такого заказа не существует"));
+                .orElseThrow(() -> new RuntimeException("Такого заказа не существует"));
 
-        if(!supplier.getId().equals(order.getSupplier().getId())){
-            throw new RuntimeException("Доступ запрещен: заказ не принадлежит данному клиенту");
+        if (!supplier.getId().equals(order.getSupplier().getId())) {
+            throw new RuntimeException("Доступ запрещен: заказ не принадлежит данному поставщику");
         }
 
         List<OrderItem> items = orderItemRepository.findByOrder(order);
 
         return items.stream()
-                .map(orderItem -> new OrderItemSupplierDtoResponse(
-                        orderItem.getTitle(),
-                        orderItem.getQuantity(),
-                        orderItem.getSellingPrice(),
-                        orderItem.getProductSku(),
-                        orderItem.getTotalPrice(),
-                        orderItem.getTotalCost(),
-                        orderItem.getCostPrice(),
-                        orderItem.getTotalCost().subtract(orderItem.getTotalPrice())
-                ))
+                .map(orderItem -> {
+                    // Находим imageUrl из product → images
+                    String url = orderItem.getProduct().getImages().stream()
+                            .filter(Image::isPreviewImage)
+                            .map(Image::getUrl)
+                            .findFirst()
+                            .orElseGet(() -> orderItem.getProduct().getImages().stream()
+                                    .map(Image::getUrl)
+                                    .findFirst()
+                                    .orElse("/images/placeholder.png")
+                            );
+
+                    return new OrderItemSupplierDtoResponse(
+                            orderItem.getTitle(),
+                            orderItem.getQuantity(),
+                            orderItem.getSellingPrice(),
+                            orderItem.getProductSku(),
+                            orderItem.getTotalPrice(),
+                            orderItem.getTotalCost(),
+                            orderItem.getCostPrice(),
+                            orderItem.getTotalCost().subtract(orderItem.getTotalPrice()),
+                            url  // передаем вычисленный URL
+                    );
+                })
                 .toList();
     }
+
 
     public Supplier getUserByPrincipal(Principal principal) {
         if (principal == null) {
