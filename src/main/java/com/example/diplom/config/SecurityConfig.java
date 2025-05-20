@@ -74,6 +74,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/v3/api-docs",
                                 "/v3/api-docs.yaml",
+                                "/api/v1/order/**",
 
                                 "/api/v1/auth/login",
                                 "/api/v1/auth/register/client",

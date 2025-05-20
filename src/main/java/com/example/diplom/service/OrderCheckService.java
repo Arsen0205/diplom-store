@@ -15,18 +15,26 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.math.BigDecimal;
 
 @Service
+@AllArgsConstructor
 public class OrderCheckService {
 
+    private final StripeService stripeService;
+
     public File generateOrderReceiptPdf(Order order) throws Exception {
-        String paymentLink = "https://metal-emus-fry.loca.lt/qr-confirm?orderId=" + order.getId(); // можно заменить на свой
+        String paymentLink = "https://fruity-bags-punch.loca.lt" + order.getId(); // можно заменить на свой
+//        String paymentLink = stripeService.createCheckoutSession(
+//                order.getId(),        order.getTotalPrice().multiply(BigDecimal.valueOf(100)).longValue()
+//        );
 
         File file = File.createTempFile("receipt_order_" + order.getId(), ".pdf");
         PdfWriter writer = new PdfWriter(file);

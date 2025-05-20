@@ -31,7 +31,7 @@ public class TelegramNotificationService {
     private final OrderRepository orderRepository;
     private final OrderCheckService orderCheckService;
 
-    private final String TELEGRAM_BOT_TOKEN = "8067199276:AAHkNyreW9RthpGYZsTBc6V543MvZOf-Vu0";
+    private final String TELEGRAM_BOT_TOKEN = "7637842579:AAEXPLFZM9p-VliUkSsFzRfmE3qmq5jadrw";
     private final String API_URL = "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN;
 
 
