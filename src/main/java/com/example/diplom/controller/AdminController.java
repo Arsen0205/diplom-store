@@ -70,8 +70,9 @@ public class AdminController {
             summary     = "Удалить продукт",
             description = "Удаляет продукт по указанному ID"
     )
-    @PostMapping("/products/delete/{id}")
+    @DeleteMapping("/products/delete/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable("id") Long id) {
         return ResponseEntity.ok(adminService.deleteProduct(id));
     }
+
 }
