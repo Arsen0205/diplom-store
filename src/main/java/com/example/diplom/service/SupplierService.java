@@ -92,7 +92,8 @@ public class SupplierService {
                         order.getStatus(),
                         order.getTotalCost(),
                         order.getTotalPrice(),
-                        order.getClient().getLogin()
+                        order.getClient().getLogin(),
+                        order.getDateTime()
                 ))
                 .toList();
     }
