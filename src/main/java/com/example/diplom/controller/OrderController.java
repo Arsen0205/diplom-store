@@ -140,4 +140,10 @@ public class OrderController {
     public ResponseEntity<byte[]> confirmPayment(@PathVariable Long orderId, Principal principal) {
         return payService.payForOrder(orderId, principal); // возвращает PDF-чек
     }
+
+    @GetMapping("/success")
+    public ResponseEntity<byte[]> successDownload(@RequestParam("orderId") Long orderId) {
+        // Здесь вызываем точно тот же код, что и в payForOrder, но без Principal
+        return payService.generateReceiptWithoutAuth(orderId);
+    }
 }

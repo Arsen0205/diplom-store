@@ -8,10 +8,9 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 public class OrderItemClientDtoResponse {
-    private Long id;
     private String title;
     private int quantity;
-    private BigDecimal price;
-    private BigDecimal total;
-    private String image;
+    private BigDecimal sellingPrice;
+    private Long productSku;
+    private BigDecimal totalPrice;
 }

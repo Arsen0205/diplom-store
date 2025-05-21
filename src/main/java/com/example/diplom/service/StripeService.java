@@ -19,7 +19,7 @@ public class StripeService {
     public String createCheckoutSession(Long orderId, Long amountInKopecks) throws StripeException {
         SessionCreateParams params = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl("http://localhost:8080/api/v1/pay/success?orderId=" + orderId)
+                .setSuccessUrl("http://localhost:8080/api/v1/order/success?orderId=" + orderId)
                 .setCancelUrl("http://localhost:8080/api/v1/pay/cancel?orderId=" + orderId)
                 .addLineItem(
                         SessionCreateParams.LineItem.builder()

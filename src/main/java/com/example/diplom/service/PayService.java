@@ -9,9 +9,7 @@ import com.example.diplom.models.enums.OrderStatus;
 import com.example.diplom.repository.ClientRepository;
 import com.example.diplom.repository.OrderRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,6 +75,61 @@ public class PayService {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Transactional
+    public ResponseEntity<byte[]> generateReceiptWithoutAuth(Long orderId) {
+        // 1) найдём заказ
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Заказ не найден"));
+
+        // 2) если ещё не PAID — пометим так
+        if (order.getStatus() != OrderStatus.PAID) {
+            order.setStatus(OrderStatus.PAID);
+            orderRepository.save(order);
+        }
+
+        // 3) соберём DTO чека
+        ReceiptDtoResponse receipt = buildReceiptDto(order);
+
+        try {
+            byte[] pdfBytes = ReceiptPdfGenerator.generateInvoice(receipt);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDisposition(
+                    ContentDisposition.attachment()
+                            .filename("receipt_" + orderId + ".pdf")
+                            .build()
+            );
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private ReceiptDtoResponse buildReceiptDto(Order order) {
+        Client client = order.getClient();
+        List<OrderItemDtoResponse> items = order.getOrderItems().stream()
+                .map(item -> new OrderItemDtoResponse(
+                        item.getProduct().getTitle(),
+                        item.getQuantity(),
+                        item.getSellingPrice(),
+                        item.getTotalPrice()
+                ))
+                .collect(Collectors.toList());
+
+        return new ReceiptDtoResponse(
+                order.getId(),
+                client.getLogin(),
+                client.getLoginTelegram(),
+                order.getAddress(),
+                order.getCity(),
+                LocalDateTime.now(),
+                order.getTotalCost(),
+                order.getTotalPrice(),
+                order.getProfit(),
+                items
+        );
     }
 
 }

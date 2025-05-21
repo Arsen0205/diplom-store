@@ -138,44 +138,30 @@ public class OrderService {
     }
 
     @Transactional
-    public List<OrderItemClientDtoResponse> ordersInfo(Long id, Principal principal) {
+    public List<OrderItemClientDtoResponse> ordersInfo(Long id, Principal principal){
         Client client = clientRepository.findById(getUserByPrincipal(principal).getId())
-                .orElseThrow(() -> new RuntimeException("Пользователь с таким id не существует"));
+                .orElseThrow(()-> new RuntimeException("Пользователь с таким id не существует"));
 
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Такого заказа не существует"));
 
-        if (!client.getId().equals(order.getClient().getId())) {
+        List<OrderItem> items = orderItemRepository.findByOrder(order);
+
+        if(!client.getId().equals(order.getClient().getId())){
             throw new RuntimeException("Доступ запрещен: заказ не принадлежит данному пользователю");
         }
 
-        List<OrderItem> items = orderItemRepository.findByOrder(order);
-
         return items.stream()
-                .map(orderItem -> {
-                    // Извлечь URL картинки точно так же, как в getAllProduct()
-                    String url = orderItem.getProduct().getImages().stream()
-                            .filter(Image::isPreviewImage)
-                            .map(Image::getUrl)
-                            .findFirst()
-                            .orElseGet(() -> orderItem.getProduct().getImages().stream()
-                                    .map(Image::getUrl)
-                                    .findFirst()
-                                    .orElse("/images/placeholder.png")
-                            );
+                .map(orderItem -> new OrderItemClientDtoResponse(
+                        orderItem.getTitle(),
+                        orderItem.getQuantity(),
+                        orderItem.getCostPrice(),
+                        orderItem.getProductSku(),
+                        orderItem.getCostPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity()))
 
-                    return new OrderItemClientDtoResponse(
-                            orderItem.getTitle(),
-                            orderItem.getQuantity(),
-                            orderItem.getCostPrice(),
-                            orderItem.getProductSku(),
-                            orderItem.getCostPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity())),
-                            url
-                    );
-                })
+                ))
                 .toList();
     }
-
 
     @Transactional
     public ResponseEntity<String> confirmedOrder(Long id, Principal principal){
