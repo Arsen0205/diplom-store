@@ -1,9 +1,6 @@
 package com.example.diplom.controller;
 
-import com.example.diplom.dto.response.OrderItemSupplierDtoResponse;
-import com.example.diplom.dto.response.OrderSupplierDtoResponse;
-import com.example.diplom.dto.response.ProductDtoResponse;
-import com.example.diplom.dto.response.SuppliersDtoResponse;
+import com.example.diplom.dto.response.*;
 import com.example.diplom.service.SupplierService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,8 +23,8 @@ public class SupplierController {
             description = "Возвращает информацию о текущем поставщике"
     )
     @GetMapping("/me")
-    public ResponseEntity<SuppliersDtoResponse> supplierOrders(Principal principal) {
-        return supplierService.supplierInfo(principal);
+    public ResponseEntity<SuppliersInfoDtoResponse> supplierOrders(Principal principal) {
+        return ResponseEntity.ok(supplierService.supplierInfo(principal));
     }
 
     @Operation(

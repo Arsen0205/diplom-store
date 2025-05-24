@@ -1,9 +1,6 @@
 package com.example.diplom.service;
 
-import com.example.diplom.dto.response.OrderItemSupplierDtoResponse;
-import com.example.diplom.dto.response.OrderSupplierDtoResponse;
-import com.example.diplom.dto.response.ProductDtoResponse;
-import com.example.diplom.dto.response.SuppliersDtoResponse;
+import com.example.diplom.dto.response.*;
 import com.example.diplom.models.*;
 import com.example.diplom.repository.OrderItemRepository;
 import com.example.diplom.repository.OrderRepository;
@@ -12,6 +9,7 @@ import com.example.diplom.repository.SupplierRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -28,21 +26,42 @@ public class SupplierService {
     private final OrderItemRepository orderItemRepository;
 
 
-    public ResponseEntity<SuppliersDtoResponse> supplierInfo(Principal principal){
-        Supplier currentUser = getUserByPrincipal(principal);
+    public SuppliersInfoDtoResponse supplierInfo(Principal principal){
+        String login = principal.getName();
+        Supplier current = supplierRepository.findByLogin(login).orElseThrow(()->new UsernameNotFoundException("Поставщика с таким логином не существует"));
 
-        SuppliersDtoResponse suppliersDtoResponse = new SuppliersDtoResponse(
-                currentUser.getId(),
-                currentUser.getLogin(),
-                currentUser.getFio(),
-                currentUser.getEmail(),
-                currentUser.getPhoneNumber(),
-                currentUser.getLoginTelegram(),
-                currentUser.getChatId(),
-                currentUser.isActive(),
-                currentUser.getRole()
+        List<Product> products = productRepository.findAllBySupplier(current);
+
+        List<ProductDtoResponse> productDtoResponses = products.stream()
+                .map(p->{
+                    String url = p.getImages().stream()
+                            .filter(Image::isPreviewImage)
+                            .map(Image::getUrl)
+                            .findFirst()
+                            .orElse("/images/placeholder.png");
+                    return new ProductDtoResponse(
+                            p.getId(),
+                            p.getTitle(),
+                            p.getQuantity(),
+                            p.getPrice(),
+                            p.getSellingPrice(),
+                            url
+                    );
+                })
+                .toList();
+
+        return new SuppliersInfoDtoResponse(
+                current.getId(),
+                current.getLogin(),
+                current.getFio(),
+                current.getEmail(),
+                current.getPhoneNumber(),
+                current.getLoginTelegram(),
+                current.getChatId(),
+                current.isActive(),
+                current.getRole(),
+                productDtoResponses
         );
-        return ResponseEntity.ok(suppliersDtoResponse);
     }
 
     @Transactional
