@@ -1,15 +1,22 @@
 package com.example.diplom.service;
 
+import com.example.diplom.dto.response.ProductDtoResponse;
+import com.example.diplom.dto.response.UserDtoResponse;
 import com.example.diplom.dto.response.UserInfoDtoResponse;
 import com.example.diplom.models.Client;
+import com.example.diplom.models.Image;
+import com.example.diplom.models.Product;
 import com.example.diplom.models.Supplier;
 import com.example.diplom.repository.ClientRepository;
+import com.example.diplom.repository.ProductRepository;
 import com.example.diplom.repository.SupplierRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,45 +24,44 @@ import java.util.Optional;
 public class UserService {
     private final ClientRepository clientRepository;
     private final SupplierRepository supplierRepository;
+    private final ProductRepository productRepository;
 
-    public UserInfoDtoResponse userInfo(Long id){
-        Optional<Client> clientOptional = clientRepository.findById(id);
-        Optional<Supplier> supplierOptional = supplierRepository.findById(id);
+    public UserDtoResponse userInfo(String login){
+        Supplier supplier = supplierRepository.findByLogin(login)
+                .orElseThrow(()-> new UsernameNotFoundException("Пользователя с такими логином не найден"));
 
-        if (clientOptional.isPresent()){
-            Client s = clientOptional.get();
+        List<Product> products = productRepository.findAllBySupplier(supplier);
 
-            return new UserInfoDtoResponse(
-                    s.getId(),
-                    s.getLogin(),
-                    s.getLoginTelegram(),
-                    s.getInn(),
-                    s.getChatId(),
-                    s.getOgrnip(),
-                    s.getEmail(),
-                    s.getPhoneNumber(),
-                    s.getFio(),
-                    s.getPassword(),
-                    s.getRole()
-            );
-        } else if (supplierOptional.isPresent()) {
-            Supplier supplier = supplierOptional.get();
+        List<ProductDtoResponse> productDtoResponses = products.stream()
+                .map(p->{
+                    String url = p.getImages().stream()
+                            .filter(Image::isPreviewImage)
+                            .map(Image::getUrl)
+                            .findFirst()
+                            .orElse("/images/placeholder.png");
+                    return new ProductDtoResponse(
+                            p.getId(),
+                            p.getTitle(),
+                            p.getQuantity(),
+                            p.getPrice(),
+                            p.getSellingPrice(),
+                            url
+                    );
+                })
+                .toList();
 
-            return new UserInfoDtoResponse(
-                    supplier.getId(),
-                    supplier.getLogin(),
-                    supplier.getLoginTelegram(),
-                    null,
-                    supplier.getChatId(),
-                    null,
-                    supplier.getEmail(),
-                    supplier.getPhoneNumber(),
-                    supplier.getFio(),
-                    supplier.getPassword(),
-                    supplier.getRole()
-            );
-        }
+        return new UserDtoResponse(
+                supplier.getId(),
+                supplier.getLogin(),
+                supplier.getFio(),
+                supplier.getEmail(),
+                supplier.getPhoneNumber(),
+                supplier.getLoginTelegram(),
+                supplier.getChatId(),
+                supplier.isActive(),
+                supplier.getRole(),
+                productDtoResponses
+        );
 
-        throw  new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
     }
 }

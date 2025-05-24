@@ -1,11 +1,13 @@
 package com.example.diplom.controller;
 
+import com.example.diplom.dto.response.UserDtoResponse;
 import com.example.diplom.dto.response.UserInfoDtoResponse;
 import com.example.diplom.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,11 +24,11 @@ public class UserController {
             summary     = "Просмотр профиля пользователя",
             description = "Возвращает информацию о пользователе по его уникальному ID"
     )
-    @GetMapping("/{id}")
-    public UserInfoDtoResponse userInfo(
+    @GetMapping("/{login}")
+    public ResponseEntity<UserDtoResponse> userInfo(
             @Parameter(description = "ID пользователя", required = true, example = "1")
-            @PathVariable("id") Long id
+            @PathVariable("login") String login
     ) {
-        return userService.userInfo(id);
+        return ResponseEntity.ok(userService.userInfo(login));
     }
 }
