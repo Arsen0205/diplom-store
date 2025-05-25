@@ -121,19 +121,34 @@ public class OrderService {
     }
 
     @Transactional
-    public List<OrderClientDtoResponse> getOrdersByClient(Principal principal){
+    public List<OrderClientDtoResponse> getOrdersByClient(Principal principal) {
         Client client = clientRepository.findById(getUserByPrincipal(principal).getId())
-                .orElseThrow(()-> new RuntimeException("Пользователя с таким id не существует"));
+                .orElseThrow(() -> new RuntimeException("Пользователя с таким id не существует"));
 
         List<Order> orders = orderRepository.findByClient(client);
 
         return orders.stream()
-                .map(order -> new OrderClientDtoResponse(
-                        order.getId(),
-                        order.getStatus(),
-                        order.getTotalCost(),
-                        order.getDateTime()
-                ))
+                .map(order -> {
+                    // собираем DTO для каждой позиции заказа
+                    List<OrderItemClientDtoResponse> items = order.getOrderItems().stream()
+                            .map(item -> new OrderItemClientDtoResponse(
+                                    item.getTitle(),
+                                    item.getQuantity(),
+                                    item.getSellingPrice(),
+                                    item.getProductSku(),      // или getId(), как у вас
+                                    item.getSellingPrice().multiply(BigDecimal.valueOf(item.getQuantity()))
+                            ))
+                            .toList();
+
+                    // возвращаем агрегированный DTO
+                    return new OrderClientDtoResponse(
+                            order.getId(),
+                            order.getStatus(),
+                            order.getTotalCost(),
+                            order.getDateTime(),
+                            items
+                    );
+                })
                 .toList();
     }
 

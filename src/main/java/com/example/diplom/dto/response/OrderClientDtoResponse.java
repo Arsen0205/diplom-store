@@ -15,4 +15,5 @@ public class OrderClientDtoResponse {
     private OrderStatus status;
     private BigDecimal totalCost;
     private LocalDateTime dateTime;
+    private List<OrderItemClientDtoResponse> orderItemClientDtoResponse;
 }
