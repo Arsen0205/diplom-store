@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Профиль пользователя</title>
+</head>
+<body>
+<h1>Информация о пользователе</h1>
+<hr>
+<div th:if="${user.isSupplier}">
+<h3>Продавец: <span th:text="${user.login}">Имя продавца</span></h3>
+</div>
+<div th:if="${user.isClient}">
+  <h3>Покупатель: <span th:text="${user.login}">Имя покупателя</span></h3>
+</div>
+<div th:if="${user.isSupplier}">
+  <h4>Товары продавца:</h4>
+  <div th:if="${#lists.isEmpty(products)}">
+    <p>Товаров нет</p>
+  </div>
+  <div th:if="${!#lists.isEmpty(products)}">
+    <div th:each="product : ${products}">
+      <p>
+        <b th:text="${product.title}">Название товара</b>
+        <span th:text="${product.price}">Цена</span> руб. |
+        <a th:href="@{/product/{id}(id=${product.id})}">Подробнее...</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<div th:if="${user.login}==${currentUser.login} and ${user.isSupplier}">
+  <hr>
+  <h3>Создать новый товар</h3>
+  <form action="/product/create" method="post" enctype="multipart/form-data">
+    Название товара: <input type="text" name="title" required/><br><br>
+    Количество: <input type="number" name="quantity" required/><br><br>
+    Себестоимость: <input type="number" name="sellingPrice" step="0.01" required/><br><br>
+    Цена продажи: <input type="number" name="price" step="0.01" required/><br><br>
+    Изображения: <input type="file" name="images" multiple/><br><br>
+    <input type="hidden" name="_csrf" value="${_csrf.token}">
+    <input type="submit" value="Добавить товар"/>
+  </form>
+</div>
+
+<!-- Корзина клиента -->
+<div th:if="${user.login} == ${currentUser.login} and ${user.isClient}">
+  <hr>
+  <h3>Корзина</h3>
+  <div th:if="${#lists.isEmpty(cart.items)}">
+    <p>Корзина пуста</p>
+  </div>
+  <div th:if="${!#lists.isEmpty(cart.items)}">
+    <table border="1">
+      <thead>
+      <tr>
+        <th>Название товара</th>
+        <th>Цена</th>
+        <th>Количество</th>
+        <th>Общая стоимость</th>
+        <th>Действия</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="item : ${cart.items}">
+        <td th:text="${item.product.title}">Название товара</td>
+        <td th:text="${item.product.price}">Цена</td>
+        <td th:text="${item.quantity}">Количество</td>
+        <td th:text="${item.price}">Общая стоимость</td>
+        <td>
+          <a th:href="@{/cart/decrease/{id}(id=${item.id})}">-</a>
+          <a th:href="@{/cart/remove/{id}(id=${item.id})}">Удалить</a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <a th:href="@{/order/checkout}">
+    <button>Перейти к оформлению заказа</button>
+  </a>
+</div>
+<div th:if="${user.login == currentUser.login and user.supplier}">
+  <a th:href="@{/supplier/orders/{id}(id=${user.id})}">
+    <button>Мои заказы</button>
+  </a>
+</div>
+
+<a th:href="@{/product}">Назад к списку товаров</a>
+</body>
+</html>

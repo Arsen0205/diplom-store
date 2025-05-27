@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Регистрация</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<h1>Регистрация</h1>
+<form action="/register" method="post">
+
+  <!-- Логин -->
+  <label for="login">Логин:</label>
+  <input type="text" id="login" name="login" required>
+
+  <!-- Логин в телеграмма -->
+  <label for="loginTelegram">Логин в телеграмме</label>
+  <input type="text" id="loginTelegram" name="loginTelegram">
+
+  <!-- Чат айди -->
+  <label for="chatId">Чат айди в телеграмме</label>
+  <input type="text" id="chatId" name="chatId">
+
+  <!-- Пароль -->
+  <label for="password">Пароль:</label>
+  <input type="password" id="password" name="password" required>
+
+  <!-- Выбор роли -->
+  <label for="role">Роль:</label>
+  <select id="role" name="role" required>
+    <option value="SUPPLIER">Поставщик</option>
+    <option value="SOLE_TRADER">Клиент</option>
+  </select>
+
+  <!-- Активность -->
+  <input type="hidden" name="active" value="true">
+
+  <!-- Отправка формы -->
+  <button type="submit">Зарегистрироваться</button>
+</form>
+<a href="/login"> Назад</a>
+</body>
+</html>
